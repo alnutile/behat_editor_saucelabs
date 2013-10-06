@@ -1,0 +1,12 @@
+After you enable the module you will need to visit composer_manager [admin/config/system/composer-manager]
+and allow it to rebuild composer.json from the composer.json file in this modules folder.
+
+After that you need to put your Saucelabs info into the admin area here
+[admin/config/system/behat-editor/sauce-labs]
+
+You can get your API on the lower left of the screen once you log in on the Dashboard.
+
+
+## Todo
+There is a bug right now that the composer manage may not pick up the auotload noted in the composer.json
+for now I am just inserting it into the vendor/composer/autoload_namespaces.php under the BehatEditor one.
