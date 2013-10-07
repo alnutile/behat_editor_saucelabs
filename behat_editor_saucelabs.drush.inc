@@ -46,5 +46,5 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
     print "Running Tests...\n";
     $output = $run->execDrush();
     $results = implode("\n\r", $output);
-    return $results;
+    return  drush_html_to_text("\n\r" . $results);
 }

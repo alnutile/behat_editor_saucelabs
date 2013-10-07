@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Implements hook_form().
+ *
+ * Create the form to add your Saucelab info
+ *
+ * @param $form
+ * @param $form_state
+ * @return mixed
+ */
 function behat_editor_saucelabs_admin_form($form, &$form_state) {
 
         $form['behat_editor_saucelabs_username'] = array(
