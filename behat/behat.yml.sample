@@ -20,6 +20,7 @@ Webdriver-saucelabs:
     class:  'FeatureContext'
   extensions:
     Behat\MinkExtension\Extension:
+      default_session: selenium2
       selenium2:
         browser: firefox
         wd_host: USER_NAME:API_KEY@ondemand.saucelabs.com/wd/hub
