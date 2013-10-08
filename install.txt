@@ -6,6 +6,8 @@ After that you need to put your Saucelabs info into the admin area here
 
 You can get your API on the lower left of the screen once you log in on the Dashboard.
 
+This will all go into your behat.yml file in the behat folder of this module.
+See the behat.yml.sample file that is in that folder.
 
 ## Todo
 There is a bug right now that the composer manage may not pick up the auotload noted in the composer.json
