@@ -19,7 +19,7 @@ function behat_editor_saucelabs_drush_command() {
         'allow-additional-options' => TRUE,
         'aliases' => array('brs'),
         'examples' => array(
-            'drush run module_name view.feature' => 'This will use the path of the module_name to run that test'
+            'drush brs module_name view.feature' => 'This will use the path of the module_name to run that test'
         ),
         'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
         'arguments' => array(
