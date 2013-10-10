@@ -2,6 +2,13 @@
 
 use Drupal\BehatEditorSauceLabs;
 
+/**
+ * @file
+ * Use the Saucelabs API with the behat_editor module
+ *
+ * @todo relative namespaces
+ */
+
 function behat_editor_saucelabs_permission() {
     $items['behat run saucelabs test'] = array(
         'title' => t('Can run a Saucelabs a test'),
