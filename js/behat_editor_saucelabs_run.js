@@ -27,7 +27,7 @@
                 if(starting_job_id != data.latest_id) {
                     var id = data.latest_id;
                     //var url = data.latest_job.video_url;
-                    var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank">Job is here</a>';
+                    var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">Job is here</a>';
                     //var screenshot = 'https://saucelabs.com/jobs/'+id+'/0000screenshot.png';
                     var status = data.latest_job.status;
                     Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"');
