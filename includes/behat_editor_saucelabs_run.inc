@@ -14,8 +14,7 @@ function behat_editor_saucelabs_run($module, $filename) {
 
         if (!class_exists('Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun')) {
             $message = t('BehatEditorSauceLabsRun not found.');
-            drupal_json_output($results = array('error' => 1, 'message' => $message));
-            exit();
+            throw new \RuntimeException($message);
         }
 
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, FALSE);
@@ -38,8 +37,7 @@ function behat_editor_saucelabs_run($module, $filename) {
     if($_REQUEST['method'] == 'create-mode') {
         if (!class_exists('Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun')) {
             $message = t('BehatEditorSauceLabsRun not found.');
-            drupal_json_output($results = array('error' => 1, 'message' => $message));
-            exit();
+            throw new \RuntimeException($message);
         }
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, 'file');
         $response = $file->save_html_to_file();
