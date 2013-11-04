@@ -9,6 +9,16 @@ You can get your API on the lower left of the screen once you log in on the Dash
 This will all go into your behat.yml file in the behat folder of this module.
 See the behat.yml.sample file that is in that folder.
 
-## Todo
-There is a bug right now that the composer manage may not pick up the auotload noted in the composer.json
-for now I am just inserting it into the vendor/composer/autoload_namespaces.php under the BehatEditor one.
+Note: to make sure tests run on saucleabs see the behat.yml.sample file
+
+Webdriver-saucelabs:
+  context:
+    class:  'FeatureContext'
+  extensions:
+    Behat\MinkExtension\Extension:
+      default_session: selenium2 <---this line is key to force all tests to run on SL
+      selenium2:
+        browser: firefox
+        wd_host: USER_NAME:API_KEY@ondemand.saucelabs.com/wd/hub
+        capabilities: { "platform": "VISTA", "browser": "firefox", "version": "7"}
+
