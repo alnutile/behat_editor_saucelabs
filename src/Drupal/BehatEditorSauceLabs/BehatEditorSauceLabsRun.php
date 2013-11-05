@@ -27,8 +27,8 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
         exec($command, $output, $return_var);
         $this->file_array = $output;
         $response = is_array($output) ? 0 : 1;
-        self::saveResults($output, $return_var);
-        return array('response' => $response, 'output_file' => $this->output_file, 'output_array' => $output);
+        $rid = self::saveResults($output, $return_var);
+        return array('response' => $response, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
     }
 
     /**

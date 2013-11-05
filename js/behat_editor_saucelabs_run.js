@@ -57,6 +57,7 @@
                         "scenario[]": scenario_array
                     };
                     var url = $(this).attr('href');
+                    var filename = $('input[name=filename]').val();
                     var latestId = '';
                     //Add this first to get previous job id
                     $.getJSON('/admin/behat/saucelabs/jobs', function(data){
@@ -66,7 +67,7 @@
                         //since it was created before my first setup of the
                         //staring id
                         Drupal.behat_editor_saucelabs.saucelabs_check(1, latestId);
-                        $.post(url, parameters, function(data){
+                        $.post(url + filename, parameters, function(data){
                             Drupal.behat_editor.renderMessage(data);
                         }, "json");
                     });
