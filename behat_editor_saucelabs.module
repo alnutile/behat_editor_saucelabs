@@ -36,6 +36,13 @@ function behat_editor_saucelabs_menu() {
         'access arguments' => array('behat run saucelabs test'),
     );
 
+    /* allow jquery to get data about jobs status */
+    $items['admin/behat/saucelabs/job/%'] = array(
+        'page callback' => array('behat_editor_saucelabs_job'),
+        'page arguments' => array(4),
+        'access arguments' => array('behat run saucelabs test'),
+    );
+
     $items['admin/config/development/behat_saucelabs'] = array(
         'page callback' => array('drupal_get_form'),
         'page arguments' => array('behat_editor_saucelabs_admin_form'),
@@ -106,4 +113,22 @@ function behat_editor_saucelabs_jobs() {
     drupal_json_output($summary);
     exit();
 }
+
+function behat_editor_saucelabs_job($job_id) {
+    composer_manager_register_autoloader();
+    if (!class_exists('Drupal\BehatEditorSauceLabs\Wrapper')) {
+        $message = t('SauceLabs Wrapper not found.');
+        drupal_json_output(array('error' => 1, 'message' => $message));
+        exit();
+    }
+
+    $username = variable_get('behat_editor_saucelabs_username', '');
+    $api_key = variable_get('behat_editor_saucelabs_api', '');
+    $check_connection = new Drupal\BehatEditorSauceLabs\Wrapper($username, $api_key);
+    $summary = $check_connection->job($job_id);
+    watchdog('test_job', print_r($summary, 1));
+    drupal_json_output($summary);
+    exit();
+}
+
 

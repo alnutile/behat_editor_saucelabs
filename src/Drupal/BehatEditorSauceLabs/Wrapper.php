@@ -30,4 +30,10 @@ class Wrapper {
         $latest_job = $jobs[0];
         return array('count' => count($jobs), 'latest_id' => $latest_id, 'jobs' => $jobs_trimmed, 'latest_job' => $latest_job);
     }
+
+    public function job($job_id) {
+        $res = self::connect();
+        $job = $res->getJob($job_id);
+        return array('job' => $job);
+    }
 }
