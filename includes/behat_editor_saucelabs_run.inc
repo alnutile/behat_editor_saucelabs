@@ -16,7 +16,7 @@ function behat_editor_saucelabs_run($module, $filename) {
             $message = t('BehatEditorSauceLabsRun not found.');
             throw new \RuntimeException($message);
         }
-
+        $filename = $filename . ".feature";
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, FALSE);
         $file_object = $file->get_file_info();
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
