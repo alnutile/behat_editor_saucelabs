@@ -1,5 +1,4 @@
 (function ($) {
-
     Drupal.behat_editor_saucelabs = {};
     Drupal.behat_editor_saucelabs.saucelabs_check = function(tries, starting_job_id) {
         var max_tries = 10;
@@ -19,7 +18,18 @@
                 tries++;
                 Drupal.behat_editor_saucelabs.saucelabs_check(tries, starting_job_id);
             } else if (tries < max_tries && starting_job_id === data.latest_id) {
-                Drupal.behat_editor.renderMessageCustom('Connecting to Saucelabs and waiting for job feedback try '+ tries + ' of ' + max_tries, 'info');
+                //Drupal.behat_editor.renderMessageCustom('Connecting to Saucelabs and waiting for job feedback try '+ tries + ' of ' + max_tries, 'info');
+                if(tries === 1) {
+                    if($('div.sl-running').length) {
+                        $('div.sl-running').fadeOut().remove();
+                    }
+                    var message = "<div class='alert alert-info sl-running'>";
+                    message += '<div>Connecting to Saucelabs and waiting for job feedback try <span class="tries">'+ tries + '</span> of ' + max_tries + '</div>';
+                    message += '</div>';
+                    $('#messages-behat').append(message);
+                } else {
+                    $('div.sl-running span.tries').text(tries);
+                }
                 tries++;
                 Drupal.behat_editor_saucelabs.saucelabs_check(tries, starting_job_id);
             } else {
@@ -49,7 +59,7 @@
             progress["queued"] = '50';
             progress["in progress"] = '75';
             progress["complete"] = '100';
-
+            console.log(data.job);
             var status = progress[data.job.status];
             if(run === 0) {
                 if($('div.sl-progress').length) {
@@ -70,6 +80,9 @@
             if(data.job.status != 'complete') {
                 window.setTimeout(function() { Drupal.behat_editor_saucelabs.getJobInfo(job_id, 1); },2000);
             };
+            if(data.job.status == 'complete') {
+                $('div.sl-progress h3').fadeOut('slow').text("SauceLabs is now 100% complete").fadeIn('slow');
+            };
         });
     }
 
@@ -77,6 +90,7 @@
 
         attach: function (context) {
             $('a.sauce').click(function(e){
+                //Drupal.behat_editor.buttons('disable');
                 e.preventDefault();
                 if(!$(this).hasClass('disabled')) {
                     var method = 'view-mode';
