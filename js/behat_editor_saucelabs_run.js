@@ -31,6 +31,8 @@
                     //var screenshot = 'https://saucelabs.com/jobs/'+id+'/0000screenshot.png';
                     var status = data.latest_job.status;
                     Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"');
+                    Drupal.behat_editor_saucelabs.getJobInfo(id, 0);
+                    return id;
                 } else {
                     Drupal.behat_editor.renderMessageCustom('We have reached the mx tries  '+ tries + ' of ' + max_tries + '<br>' +
                         'SauceLabs has not responded with a new ID. That does not mean the test did not work though. ' +
@@ -39,6 +41,37 @@
                 }
             }
     };
+
+    Drupal.behat_editor_saucelabs.getJobInfo = function(job_id, run) {
+        $.getJSON('/admin/behat/saucelabs/job/' + job_id, function(data){
+            var progress = new Array();
+            progress["new"] = '25';
+            progress["queued"] = '50';
+            progress["in progress"] = '75';
+            progress["complete"] = '100';
+
+            var status = progress[data.job.status];
+            if(run === 0) {
+                if($('div.sl-progress').length) {
+                    $('div.sl-progress').fadeOut().remove();
+                }
+                var message = "<div class='alert alert-info sl-progress'>";
+                message += "<h3>Your Saucelabs job is in progress</h3>";
+                message += '<div class="progress progress-striped active">';
+                message += '<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="'+status+'" aria-valuemin="0" aria-valuemax="100" style="width: '+status+'%">';
+                message += '</div></div></div>';
+                $('#messages-behat').append(message);
+            } else {
+                $('div.sl-progress div.progress-bar-info').attr('aria-valuenow', status);
+                $('div.sl-progress div.progress-bar-info').css('width', status +'%');
+            }
+
+
+            if(data.job.status != 'complete') {
+                window.setTimeout(function() { Drupal.behat_editor_saucelabs.getJobInfo(job_id, 1); },2000);
+            };
+        });
+    }
 
     Drupal.behaviors.behat_editor_saucelabs_run = {
 
@@ -58,14 +91,13 @@
                     };
                     var url = $(this).attr('href');
                     var filename = $('input[name=filename]').val();
+                    var urlFilename = url + filename;
                     var latestId = '';
+                    var data = {};
+                    var newId = '';
                     //Add this first to get previous job id
-                    $.getJSON('/admin/behat/saucelabs/jobs', function(data){
-                        var latestId = 0;
+                    var getID = $.getJSON('/admin/behat/saucelabs/jobs', function(data){
                         latestId = data.latest_id;
-                        //So I do not miss the lastId before starting a job
-                        //since it was created before my first setup of the
-                        //staring id
                         Drupal.behat_editor_saucelabs.saucelabs_check(1, latestId);
                         $.post(url + filename, parameters, function(data){
                             Drupal.behat_editor.renderMessage(data);
