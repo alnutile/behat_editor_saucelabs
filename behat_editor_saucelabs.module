@@ -58,6 +58,14 @@ function behat_editor_saucelabs_menu() {
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
     $forms = array('behat_editor_view_form', 'behat_editor_edit_form', 'behat_editor_add_form');
     if(in_array($form_id, $forms)) {
+
+        //Hide Run Test button set in variables
+        if(variable_get('behat_editor_saucelabs_hide_run') === 1) {
+            $form['actions']['run_test']['#attributes'] = array(
+                'class' => array('hidden')
+            );
+        }
+
         composer_manager_register_autoloader();
         if (!class_exists('Drupal\BehatEditorSauceLabs\Wrapper')) {
             $message = t('SauceLabs Wrapper not found.');
