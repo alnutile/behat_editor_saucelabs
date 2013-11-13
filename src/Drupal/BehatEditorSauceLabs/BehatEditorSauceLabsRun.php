@@ -18,11 +18,10 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
             $tags = "--tags '~@javascript'";
         }
         $command = parent::behatCommandArray($tags);
-        //$command = "cd $this->behat_path && ./bin/behat --config=\"$this->yml_path\" --no-paths  --profile=Webdriver-saucelabs  $this->absolute_file_path";
         $context1 = 'behat_run_saucelabs';
-        drupal_alter('behat_editor_command', $command, $context1);
         $command['config'] = "--config=\"$this->yml_path\"";
         $command['profile'] = "--profile=Webdriver-saucelabs";
+        drupal_alter('behat_editor_command', $command, $context1);
         $command = implode(' ', $command);
         exec($command, $output, $return_var);
         $this->file_array = $output;
