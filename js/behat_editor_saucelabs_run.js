@@ -55,7 +55,6 @@
             progress["queued"] = '50';
             progress["in progress"] = '75';
             progress["complete"] = '100';
-            console.log(data.job);
             var status = progress[data.job.status];
             if(run === 0) {
                 if($('div.sl-progress').length) {
