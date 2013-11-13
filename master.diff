@@ -1,0 +1,73 @@
+diff --git a/behat_editor_saucelabs.drush.inc b/behat_editor_saucelabs.drush.inc
+index d8cde17..f92dcc0 100644
+--- a/behat_editor_saucelabs.drush.inc
++++ b/behat_editor_saucelabs.drush.inc
+@@ -28,6 +28,20 @@ function behat_editor_saucelabs_drush_command() {
+         ),
+     );
+ 
++    $items['behat-run-sauce-folder'] = array(
++        'description' => 'Pass a module name to run all tests in it\'s behat_features folder and decide to turn on Javascript',
++        'allow-additional-options' => TRUE,
++        'aliases' => array('brsf'),
++        'examples' => array(
++            'drush brsf module_name 1' => 'This will use the path of the module_name to run that test and 1 means you want to include Javascript'
++        ),
++        'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
++        'arguments' => array(
++            'module' => 'The module name that the test files are in',
++            'javascript' => '1 if you want to run javascript based tests 0 if not. Javascript means you are running this locally.',
++            'subfolder' => '(Optional) if this is a folder in the behat_features folder',
++        ),
++    );
+     return $items;
+ }
+ 
+@@ -47,4 +61,34 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
+     $output = $run->execDrush();
+     $results = implode("\n\r", $output);
+     return  drush_html_to_text("\n\r" . $results);
+-}
+\ No newline at end of file
++}
++
++//@todo add profile switch as well
++function drush_behat_editor_behat_run_sauce_folder() {
++    print "Running Tests...\n";
++    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
++    composer_manager_register_autoloader();
++    //@todo validate args
++    $module = func_get_arg(0);
++    if(func_num_args() > 1) {
++        $javascript = func_get_arg(1);
++    } else {
++        $javascript = 0;
++    }
++
++    $fileObject = Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun::fileObjecBuilder();
++    $path = drupal_get_path('module', $module);
++    $file_tests_folder = variable_get('behat_editor_default_folder', BEHAT_EDITOR_DEFAULT_FOLDER);
++    $path = drupal_realpath($path) . '/' . $file_tests_folder;
++    if(func_num_args() > 2) {
++        $path = $path . '/' . func_get_arg(2);
++    }
++    $fileObject->absolute_file_path = $path;
++    $run = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($fileObject);
++    print "Running Tests in folder  {$fileObject['filename']}...\n";
++    $output = $run->exec($javascript);
++    $results = implode("\n\r", $output['output_array']);
++    drush_print($results);
++
++    return "All Tests ran for module $module";
++}
+diff --git a/src/Drupal/BehatEditorSauceLabs/BehatEditorSauceLabsRun.php b/src/Drupal/BehatEditorSauceLabs/BehatEditorSauceLabsRun.php
+index 066b772..7761882 100644
+--- a/src/Drupal/BehatEditorSauceLabs/BehatEditorSauceLabsRun.php
++++ b/src/Drupal/BehatEditorSauceLabs/BehatEditorSauceLabsRun.php
+@@ -55,4 +55,4 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
+         return $output;
+     }
+ 
+-}
+\ No newline at end of file
++}
