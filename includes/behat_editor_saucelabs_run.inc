@@ -9,6 +9,7 @@ function behat_editor_saucelabs_run($module, $filename) {
 
     if($_REQUEST['method'] == 'view-mode') {
         //@todo include these in autoloader
+        //  since all functions are in a class now
         module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
         module_load_include('inc', 'behat_editor', 'tpl/behat_shared_views');
 
@@ -17,10 +18,11 @@ function behat_editor_saucelabs_run($module, $filename) {
             throw new \RuntimeException($message);
         }
         $filename = $filename . ".feature";
+        $settings = $_REQUEST['settings'];
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, FALSE);
         $file_object = $file->get_file_info();
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
-        $run_test_response = $res->exec();
+        $run_test_response = $res->exec(FALSE, $settings);
         $response = $run_test_response['response'];
 
         //Check the Response from Running the Tests
@@ -39,12 +41,13 @@ function behat_editor_saucelabs_run($module, $filename) {
             $message = t('BehatEditorSauceLabsRun not found.');
             throw new \RuntimeException($message);
         }
+        $settings = $_REQUEST['settings'];
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, 'file');
         $response = $file->save_html_to_file();
         if($response['file'] != FALSE){
             $file_object = $file->get_file_info();
             $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
-            $run_test_response = $res->exec();
+            $run_test_response = $res->exec(FALSE, $settings);
             $response = $run_test_response['response'];
             //Check the Response from Running the Tests
             if($response == 0) {
