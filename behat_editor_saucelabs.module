@@ -105,6 +105,32 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
 }
 
 
+/**
+ * Alter the behat.yml array
+ *   Set the path to our FC
+ *   Let SauceLabs set the settings for it?
+ * @param $behat_yml
+ * @param $context1
+ */
+function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1) {
+    if($context1 == 'generate_yml') {
+        $username = variable_get('behat_editor_saucelabs_username', '');
+        $token = variable_get('behat_editor_saucelabs_api', '');
+        $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
+        $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
+        $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
+            'browser' => 'chrome',
+            'wd_host' => "{$username}:{$token}@ondemand.saucelabs.com/wd/hub",
+            'capabilities' => array(
+                "platform" => 'Windows XP',
+                'browser' => 'chrome',
+                'version' => ''
+            )
+        );
+    }
+}
+
+
 
 function behat_editor_saucelabs_jobs() {
     composer_manager_register_autoloader();
@@ -134,7 +160,6 @@ function behat_editor_saucelabs_job($job_id) {
     $api_key = variable_get('behat_editor_saucelabs_api', '');
     $check_connection = new Drupal\BehatEditorSauceLabs\Wrapper($username, $api_key);
     $summary = $check_connection->job($job_id);
-    watchdog('test_job', print_r($summary, 1));
     drupal_json_output($summary);
     exit();
 }
