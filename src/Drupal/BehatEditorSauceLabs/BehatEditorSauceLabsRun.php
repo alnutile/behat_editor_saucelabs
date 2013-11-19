@@ -1,9 +1,9 @@
 <?php
 
 namespace Drupal\BehatEditorSauceLabs;
-use Drupal\BehatEditor\BehatEditorRun;
+use Drupal\BehatEditor;
 
-class BehatEditorSauceLabsRun extends BehatEditorRun {
+class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
 
     public function __construct($file_object) {
         parent::__construct($file_object);
@@ -11,23 +11,29 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
         $this->yml_path = drupal_realpath($path) . '/behat/behat.yml';
     }
 
-    public function exec($javascript = FALSE) {
+    public function exec($javascript = FALSE, $settings = array()) {
+        composer_manager_register_autoloader();
         if($javascript == TRUE) {
             $tags = '';
         } else {
             $tags = "--tags '~@javascript'";
         }
         $command = parent::behatCommandArray($tags);
-        $context1 = 'behat_run_saucelabs';
-        $command['config'] = "--config=\"$this->yml_path\"";
-        $command['profile'] = "--profile=Webdriver-saucelabs";
-        drupal_alter('behat_editor_command', $command, $context1);
+        $behat_yml_path = new BehatEditor\GenerateBehatYml($settings);
+        $behat_yml = $behat_yml_path->writeBehatYmlFile();
+        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
+        $saved_settings['sid'] = $settings;
+
+        $command['config'] = "--config=\"$behat_yml\"";
+        $command['tags'] = '';
+        $command['profile'] = "--profile=saucelabs";
+
         $command = implode(' ', $command);
         exec($command, $output, $return_var);
         $this->file_array = $output;
-        $response = is_array($output) ? 0 : 1;
-        $rid = self::saveResults($output, $return_var);
-        return array('response' => $response, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
+        $behat_yml_path->deleteBehatYmlFile();
+        $rid = self::saveResults($output, $return_var, $saved_settings);
+        return array('response' => $return_var, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
     }
 
     /**
@@ -38,7 +44,7 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
      * @param string $profile
      * @return array
      */
-    public function execDrush($javascript = FALSE, $tag_include = FALSE, $profile = 'default') {
+    public function execDrush($javascript = FALSE, $tag_include = FALSE, $profile = 'default', $settings = array()) {
         if($javascript == TRUE) {
             $tags_exclude = '';
         } else {
@@ -50,9 +56,23 @@ class BehatEditorSauceLabsRun extends BehatEditorRun {
         } else {
             $tag_include = '';
         }
-        exec("cd $this->behat_path && ./bin/behat --config=\"$this->yml_path\" --no-paths  --profile=Webdriver-saucelabs  $this->absolute_file_path", $output);
-        parent::saveResults($output);
-        return $output;
+        //@todo remove tag arg in behatCommandArray
+        $command = parent::behatCommandArray($tags_exclude);
+        $behat_yml_path = new BehatEditor\GenerateBehatYml($settings);
+        $behat_yml = $behat_yml_path->writeBehatYmlFile();
+        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
+        $saved_settings['sid'] = $settings;
+
+        $command['config'] = "--config=\"$behat_yml\"";
+        $command['tags'] = '';
+        $command['profile'] = "--profile=saucelabs";
+
+        $command = implode(' ', $command);
+        exec($command, $output, $return_var);
+        $this->file_array = $output;
+        $behat_yml_path->deleteBehatYmlFile();
+        $rid = self::saveResults($output, $return_var, $saved_settings);
+        return array('response' => $return_var, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
     }
 
 }
