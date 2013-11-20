@@ -106,6 +106,21 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
 
 
 /**
+ * Hooking the exec function from BehatEditorRun and altering the path that is being used.
+ *   this will set the profile created in the behat.yml file called saucelabs to be used.
+ *
+ * @param $command
+ * @param $context1
+ */
+function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1){
+
+    if($context1 == 'behat_run') {
+        watchdog("pfizer_behat", t('Running tests for @context', array('@context' => $context1)));
+        $command['profile'] = "--profile=saucelabs";
+  }
+}
+
+/**
  * Alter the behat.yml array
  *   Set the path to our FC
  *   Let SauceLabs set the settings for it?
