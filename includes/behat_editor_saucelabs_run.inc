@@ -19,6 +19,7 @@ function behat_editor_saucelabs_run($module, $filename) {
         }
         $filename = $filename . ".feature";
         $settings = $_REQUEST['settings'];
+        watchdog('test_sl_request', print_r($_REQUEST, 1));
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, FALSE);
         $file_object = $file->get_file_info();
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
@@ -41,6 +42,7 @@ function behat_editor_saucelabs_run($module, $filename) {
             $message = t('BehatEditorSauceLabsRun not found.');
             throw new \RuntimeException($message);
         }
+        watchdog('test_sl_request', print_r($_REQUEST, 1));
         $settings = $_REQUEST['settings'];
         $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, 'file');
         $response = $file->save_html_to_file();
