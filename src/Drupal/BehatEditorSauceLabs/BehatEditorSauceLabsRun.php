@@ -18,22 +18,33 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         } else {
             $tags = "--tags '~@javascript'";
         }
-        $command = parent::behatCommandArray($tags);
-        $behat_yml_path = new BehatEditor\GenerateBehatYml($settings);
-        $behat_yml = $behat_yml_path->writeBehatYmlFile();
-        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
-        $saved_settings['sid'] = $settings;
+        $this->tags = $tags;
+        $this->settings = $settings;
 
-        $command['config'] = "--config=\"$behat_yml\"";
+        $command = parent::behatCommandArray();
+
+        //@todo move this into a shared method for exec and execDrush
+        $behat_yml_path = new BehatEditor\GenerateBehatYml($this->settings);
+        $this->behat_yml = $behat_yml_path->writeBehatYmlFile();
+
+        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
+        $saved_settings['sid'] = $this->settings;
+
+        $command['config'] = "--config=\"$this->behat_yml\"";
         $command['tags'] = '';
         $command['profile'] = "--profile=saucelabs";
-
         $command = implode(' ', $command);
+
         exec($command, $output, $return_var);
-        $this->file_array = $output;
+
         $behat_yml_path->deleteBehatYmlFile();
-        $rid = self::saveResults($output, $return_var, $saved_settings);
-        return array('response' => $return_var, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
+
+        $results = new BehatEditor\Results();
+        $output = $results->prepareResultsAndInsert($output, $return_var, $settings, $this->filename, $this->module);
+        $this->clean_results = $output['clean_results'];
+        $this->rid = $output['rid'];
+
+        return array('response' => $return_var, 'output_file' => $this->clean_results, 'output_array' =>  $this->clean_results, 'rid' => $this->rid);
     }
 
     /**
@@ -56,23 +67,40 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         } else {
             $tag_include = '';
         }
-        //@todo remove tag arg in behatCommandArray
-        $command = parent::behatCommandArray($tags_exclude);
-        $behat_yml_path = new BehatEditor\GenerateBehatYml($settings);
-        $behat_yml = $behat_yml_path->writeBehatYmlFile();
-        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
-        $saved_settings['sid'] = $settings;
+        $this->tags = "$tag_include $tags_exclude";
+        $this->settings = $settings;
 
-        $command['config'] = "--config=\"$behat_yml\"";
-        $command['tags'] = '';
-        $command['profile'] = "--profile=saucelabs";
+        $command = self::behatCommandArray();
+
+        //@todo move this into a shared method for exec and execDrush
+        $behat_yml_path = new BehatEditor\GenerateBehatYml($this->settings);
+        $this->behat_yml = $behat_yml_path->writeBehatYmlFile();
+
+
+        $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
+        $saved_settings['sid'] = $this->settings;
+        $command['config'] = "--config=\"$this->behat_yml\"";
+        $context1 = 'behat_run';
+        drupal_alter('behat_editor_command', $command, $context1);
+        //$command['format'] = '--format=pretty';
+
+        if($profile !== 0) {
+            $command['profile'] = "--profile=$profile";
+        }
 
         $command = implode(' ', $command);
+
+        $command['profile'] = "--profile=saucelabs";
         exec($command, $output, $return_var);
-        $this->file_array = $output;
+
         $behat_yml_path->deleteBehatYmlFile();
-        $rid = self::saveResults($output, $return_var, $saved_settings);
-        return array('response' => $return_var, 'output_file' => $this->output_file, 'output_array' => $output, 'rid' => $rid);
+
+        $results = new BehatEditor\Results();
+        $output = $results->prepareResultsAndInsert($output, $return_var, $settings, $this->filename, $this->module);
+        $this->clean_results = $output['clean_results'];
+        $this->rid = $output['rid'];
+
+        return array('response' => $return_var, 'output_file' => $this->clean_results, 'output_array' =>  $this->clean_results, 'rid' => $this->rid);
     }
 
 }
