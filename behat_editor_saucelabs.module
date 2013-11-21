@@ -43,6 +43,23 @@ function behat_editor_saucelabs_menu() {
         'access arguments' => array('behat run saucelabs test'),
     );
 
+    /* allow jquery to get data about jobs status */
+    $items['admin/behat/saucelabs/os'] = array(
+        'page callback' => array('behat_editor_saucelabs_os'),
+        'access arguments' => array('behat run saucelabs test'),
+        'file path' => "$path/includes",
+        'file' => 'behat_editor_saucelabs_settings.inc',
+    );
+
+    /* allow jquery to get data about jobs status */
+    $items['admin/behat/saucelabs/browser/%'] = array(
+        'page callback' => array('behat_editor_saucelabs_browser'),
+        'page arguments' => array(4),
+        'access arguments' => array('behat run saucelabs test'),
+        'file path' => "$path/includes",
+        'file' => 'behat_editor_saucelabs_settings.inc',
+    );
+
     $items['admin/config/development/behat_saucelabs'] = array(
         'page callback' => array('drupal_get_form'),
         'page arguments' => array('behat_editor_saucelabs_admin_form'),
@@ -57,7 +74,9 @@ function behat_editor_saucelabs_menu() {
 
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
     $forms = array('behat_editor_view_form', 'behat_editor_edit_form', 'behat_editor_add_form');
+    dpm($form);
     if(in_array($form_id, $forms)) {
+
 
         //Hide Run Test button set in variables
         if(variable_get('behat_editor_saucelabs_hide_run') === 1) {
@@ -92,6 +111,7 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
         }
         $path = drupal_get_path('module', 'behat_editor_saucelabs');
         $form['#attached']['js']['behat_editor_saucelabs_run'] = $path . '/js/behat_editor_saucelabs_run.js';
+        $form['#attached']['js']['behat_editor_saucelabs_settings'] = $path . '/js/behat_editor_saucelabs_settings.js';
         $form['#attached']['css']['behat_editor_saucelabs_run'] = $path . '/css/app.css';
 
         $form['actions']['saucelabs_run'] = array(
@@ -100,6 +120,25 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
             '#name' => 'sauce_labs',
             '#href' => "admin/behat/saucelabs/run/$module/",
             '#attributes' => array('class' => array('sauce', 'btn', 'btn-success', "$disabled"))
+        );
+
+        $form['results_area']['settings']['os_browser'] = array(
+            '#type' => 'container',
+            '#prefix' => t('<hr><h4>Choose an OS and a Broswer to run the test on</h4><br>')
+        );
+
+        $form['results_area']['settings']['os_browser']['os'] = array(
+            '#type' => 'select',
+            '#options' => array(),
+            '#empty_value' => '--none--',
+            '#description' => t('What OS and Browser should be used for this test')
+        );
+
+        $form['results_area']['settings']['os_browser']['browser'] = array(
+            '#type' => 'select',
+            '#options' => array(),
+            '#empty_value' => '--choose OS first--',
+            '#description' => t('What Browser do you want to use')
         );
     }
 }
