@@ -36,4 +36,14 @@ class Wrapper {
         $job = $res->getJob($job_id);
         return array('job' => $job);
     }
+
+    public function getOs() {
+        $res = self::connect();
+        $browsers = $res->getBrowsers();
+        return array('os' => $browsers);
+    }
+
+    public function getBrowser($os){
+        return drupal_map_assoc(array(1, 2, 3));
+    }
 }
