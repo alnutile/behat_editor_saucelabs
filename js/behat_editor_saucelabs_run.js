@@ -37,7 +37,7 @@
                 var id = data.latest_id;
                 var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">Job is here</a>';
                 var status = data.latest_job.status;
-                Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"');
+                Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"', 'success');
                 Drupal.behat_editor_saucelabs.getJobInfo(id, 0);
             } else {
                 Drupal.behat_editor.renderMessageCustom('We have reached the mx tries  '+ tries + ' of ' + max_tries + '<br>' +
@@ -95,10 +95,17 @@
                     var scenario_array = Drupal.behat_editor.make_scenario_array(scenario);
                     var base_url_usid = $('select#edit-users option:selected').val();
                     var base_url_gsid = $('select#edit-group option:selected').val();
+                    var os_version = $('select#edit-os option:selected').val();
+                    var browser_version = $('select#edit-browser option:selected').val();
                     var parameters = {
                         "method": method,
                         "scenario[]": scenario_array,
-                        "settings": { "base_url_usid": base_url_usid, "base_url_gsid": base_url_gsid }
+                        "settings": {
+                            "base_url_usid": base_url_usid,
+                            "base_url_gsid": base_url_gsid,
+                            "os_version": os_version,
+                            "browser_version": browser_version
+                        }
                     };
                     var url = $(this).attr('href');
                     var filename = $('input[name=filename]').val();

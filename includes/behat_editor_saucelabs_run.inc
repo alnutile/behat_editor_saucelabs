@@ -23,10 +23,8 @@ function behat_editor_saucelabs_run($module, $filename) {
         $file_object = $file->get_file_info();
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
         $run_test_response = $res->exec(FALSE, $settings);
-        $response = $run_test_response['response'];
-
         //Check the Response from Running the Tests
-        if($response == 0) {
+        if($run_test_response['rid']) {
             $results = $res->generateReturnPassOutput();
             drupal_json_output($results);
             exit();
@@ -48,9 +46,8 @@ function behat_editor_saucelabs_run($module, $filename) {
             $file_object = $file->get_file_info();
             $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
             $run_test_response = $res->exec(FALSE, $settings);
-            $response = $run_test_response['response'];
-            //Check the Response from Running the Tests
-            if($response == 0) {
+            watchdog('test_response', print_r($run_test_response, 1));
+            if($run_test_response['rid']) {
                 $results = $res->generateReturnPassOutput();
                 drupal_json_output($results);
                 exit();
