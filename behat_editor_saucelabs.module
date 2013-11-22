@@ -74,7 +74,26 @@ function behat_editor_saucelabs_menu() {
 
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
     $forms = array('behat_editor_view_form', 'behat_editor_edit_form', 'behat_editor_add_form');
-    dpm($form);
+
+    if($form_id == 'behat_editor_bulk_form_tags') {
+
+        $username = variable_get('behat_editor_saucelabs_username', '');
+        $api_key = variable_get('behat_editor_saucelabs_api', '');
+
+        $check_connection = new Drupal\BehatEditorSauceLabs\Wrapper($username, $api_key);
+        $connected = $check_connection->connectTest();
+
+        if(isset($connected['error']) || empty($username) || empty($api_key)) {
+            $disabled = 'disabled';
+            drupal_set_message(t("Saucelabs connection error: :error The Saucelabs button will be disabled till resolved.", array(':error' => $connected['error'])), 'error');
+            drupal_set_message(t("You can configure SauceLabs here !here", array('!here' => l('configure', 'admin/config/development/behat_saucelabs'))), 'info');
+        } else {
+            $disabled = '';
+        }
+        $path = drupal_get_path('module', 'behat_editor_saucelabs');
+        $form['#attached']['js']['behat_editor_saucelabs_settings'] = $path . '/js/behat_editor_saucelabs_settings.js';
+    }
+
     if(in_array($form_id, $forms)) {
 
 
@@ -122,24 +141,6 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
             '#attributes' => array('class' => array('sauce', 'btn', 'btn-success', "$disabled"))
         );
 
-        $form['results_area']['settings']['os_browser'] = array(
-            '#type' => 'container',
-            '#prefix' => t('<hr><h4>Choose an OS and a Broswer to run the test on</h4><br>')
-        );
-
-        $form['results_area']['settings']['os_browser']['os'] = array(
-            '#type' => 'select',
-            '#options' => array(),
-            '#empty_value' => '--none--',
-            '#description' => t('What OS and Browser should be used for this test')
-        );
-
-        $form['results_area']['settings']['os_browser']['browser'] = array(
-            '#type' => 'select',
-            '#options' => array(),
-            '#empty_value' => '--choose OS first--',
-            '#description' => t('What Browser do you want to use')
-        );
     }
 }
 
@@ -166,19 +167,22 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $behat_yml
  * @param $context1
  */
-function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1) {
+function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
     if($context1 == 'generate_yml') {
+        list($browser, $version) = explode("|", $settings['browser_version']);
+        $os = $settings['os_version'];
+
         $username = variable_get('behat_editor_saucelabs_username', '');
         $token = variable_get('behat_editor_saucelabs_api', '');
         $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
-            'browser' => 'chrome',
+            'browser' => $browser,
             'wd_host' => "{$username}:{$token}@ondemand.saucelabs.com/wd/hub",
             'capabilities' => array(
-                "platform" => 'Windows XP',
-                'browser' => 'chrome',
-                'version' => ''
+                "platform" => "$os",
+                'browser' => "$browser",
+                'version' => "$version"
             )
         );
     }

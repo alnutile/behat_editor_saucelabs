@@ -39,7 +39,7 @@ class Wrapper {
 
     public function getOs() {
         $res = self::connect();
-        $browsers = $res->getBrowsers();
+        $browsers = $res->getBrowsers('webdriver');
         return array('os' => $browsers);
     }
 
