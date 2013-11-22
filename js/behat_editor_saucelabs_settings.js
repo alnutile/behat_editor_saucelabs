@@ -10,8 +10,8 @@
                     if($('#edit-os option[value="'+os_name+'"').val() === undefined) {
                         $('#edit-os').append($("<option />").val(os_name).text(os_name));
                         if(os_name == 'Windows 2012') {
+                            $('#edit-os option[value="Windows 2012"]').attr('selected', 'selected');
                             Drupal.behat_editor_saucelabs.getBrowser(os_name);
-                            $('#edit-os select').val(os_name);
                         }
                     }
             }
