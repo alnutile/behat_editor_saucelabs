@@ -71,10 +71,12 @@
                 $('div.sl-progress div.progress-bar-info').css('width', status +'%');
             }
 
+            console.log(data);
 
             if(data.job.status != 'complete') {
                 window.setTimeout(function() { Drupal.behat_editor_saucelabs.getJobInfo(job_id, 1); },2000);
             };
+
             if(data.job.status == 'complete') {
                 $('div.sl-progress h3').fadeOut('slow').text("SauceLabs is now 100% complete").fadeIn('slow');
             };
