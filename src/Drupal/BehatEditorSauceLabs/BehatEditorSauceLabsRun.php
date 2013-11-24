@@ -91,10 +91,9 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         if($profile !== 0) {
             $command['profile'] = "--profile=$profile";
         }
-
-        $command = implode(' ', $command);
-
+        //Forcing this to be SL
         $command['profile'] = "--profile=saucelabs";
+        $command = implode(' ', $command);
         exec($command, $output, $return_var);
 
         $behat_yml_path->deleteBehatYmlFile();
