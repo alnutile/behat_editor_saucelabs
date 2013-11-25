@@ -157,7 +157,7 @@ function behat_editor_saucelabs_video_modal(&$form) {
 		    </div>';
 
 
-    $form['message']['#markup'] = behat_editor_modal($title, $body, $buttons = '', 'slVideo');
+    $form['behat_editor_saucelabs']['#markup'] = behat_editor_modal($title, $body, $buttons = '', 'slVideo');
 }
 
 
