@@ -1,7 +1,7 @@
 (function ($) {
 
 
-    Drupal.behat_editor_saucelabs = {};
+    Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
     Drupal.behat_editor_saucelabs.saucelabs_check = function(tries, starting_job_id) {
         var max_tries = 10;
         tries = typeof tries !== 'undefined' ? tries : 1;

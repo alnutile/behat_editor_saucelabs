@@ -91,7 +91,9 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
 
     $run = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
     print "Running Tests...\n";
-    $output = $run->execDrush($javascript, $tag, $profile, array('base_url_usid' => $usid, 'base_url_gsid' => 0));
+    //set default browser and os
+
+    $output = $run->execDrush($javascript, $tag, $profile, array('base_url_usid' => $usid, 'base_url_gsid' => 0, 'os_version' => 'Windows 2012', 'browser_version' => 'firefox'));
     $results = str_replace(array("    ", "---- Feature", "::: Scenario", "::: Background"), array("\n", "\n---- Feature", "\n::: Scenario", "\n::: Background"), drush_html_to_text($output['output_array']));
     //@todo
     //working on a way to pass fails or pass
