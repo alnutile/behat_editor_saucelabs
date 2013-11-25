@@ -93,7 +93,6 @@
                 $('div.sl-progress div.progress-bar-info').css('width', status +'%');
             }
 
-            console.log(data);
 
             if(data.job.status != 'complete') {
                 window.setTimeout(function() { Drupal.behat_editor_saucelabs.getJobInfo(job_id, 1); },2000);
