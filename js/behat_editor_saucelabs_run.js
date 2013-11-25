@@ -74,9 +74,12 @@
                 if($('div.sl-progress').length) {
                     $('div.sl-progress').fadeOut().remove();
                 }
+                var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">here</a>';
+
                 var message = "<div class='alert alert-info sl-progress'>";
                 message += "<h3>Your Saucelabs job is in progress</h3>" +
-                    "<small>a video will be available when done</small>";
+                    "<small>a video will be available on this page when done</small><br>" +
+                    "<small>but you can see the job "+url+" as if you have an account</small>";
                 message += '<div class="progress progress-striped active">';
                 message += '<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="'+status+'" aria-valuemin="0" aria-valuemax="100" style="width: '+status+'%">';
                 message += '</div>';
