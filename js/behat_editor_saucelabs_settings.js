@@ -3,17 +3,19 @@
     Drupal.behat_editor_saucelabs.getOs = function() {
         $( "#edit-os" ).load( "/admin/behat/saucelabs/os", function(data) {
             var option_list = jQuery.parseJSON(data);
-
+            var os_list_unique = [];
             $('body').data("sauce_options", option_list);
             for(var i = 0; i < option_list['os'].length; i++) {
                 var os_name = option_list['os'][i]['os'];
-                    if($('#edit-os option[value="'+os_name+'"').val() === undefined) {
-                        $('#edit-os').append($("<option />").val(os_name).text(os_name));
-                        if(os_name == 'Windows 2012') {
-                            $('#edit-os option[value="Windows 2012"]').attr('selected', 'selected');
-                            Drupal.behat_editor_saucelabs.getBrowser(os_name);
-                        }
-                    }
+                os_list_unique[os_name] = os_name;
+            }
+            for(var key in os_list_unique) {
+                var nice_name = os_list_unique[key];
+                $('#edit-os').append($("<option />").val(nice_name).text(nice_name));
+                if(nice_name == 'Windows 2012') {
+                    $('#edit-os option[value="Windows 2012"]').attr('selected', 'selected');
+                    Drupal.behat_editor_saucelabs.getBrowser(nice_name);
+                }
             }
         });
     };

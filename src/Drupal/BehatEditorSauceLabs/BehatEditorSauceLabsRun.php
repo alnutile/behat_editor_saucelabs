@@ -33,6 +33,8 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command['config'] = "--config=\"$this->behat_yml\"";
         $command['tags'] = '';
         $command['profile'] = "--profile=saucelabs";
+        $context1 = 'behat_run_saucelabs';
+        drupal_alter('behat_editor_command', $command, $context1);
         $command = implode(' ', $command);
 
         exec($command, $output, $return_var);
@@ -80,17 +82,18 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $saved_settings['behat_yml'] = $behat_yml_path->behat_yml;
         $saved_settings['sid'] = $this->settings;
         $command['config'] = "--config=\"$this->behat_yml\"";
-        $context1 = 'behat_run';
+        $context1 = 'behat_run_saucelabs';
         drupal_alter('behat_editor_command', $command, $context1);
         //$command['format'] = '--format=pretty';
 
+        //Since this is drush I am assuming
+        //  the user passed a profile
         if($profile !== 0) {
             $command['profile'] = "--profile=$profile";
         }
-
-        $command = implode(' ', $command);
-
+        //Forcing this to be SL
         $command['profile'] = "--profile=saucelabs";
+        $command = implode(' ', $command);
         exec($command, $output, $return_var);
 
         $behat_yml_path->deleteBehatYmlFile();
