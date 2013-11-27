@@ -73,10 +73,20 @@ function behat_editor_saucelabs_menu() {
 }
 
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
-    $forms = array('behat_editor_view_form', 'behat_editor_edit_form', 'behat_editor_add_form', 'behat_editor_bulk_form_tags', 'behat_editor_bulk_form_modules');
 
+    //Deal with Bulk Interface / Batch API
+    $form_batch = array('behat_editor_bulk_form_tags', 'behat_editor_bulk_form_modules');
+    if(in_array($form_id, $form_batch)) {
+        composer_manager_register_autoloader();
+        $path = drupal_get_path('module', 'behat_editor_saucelabs');
+        $form['#attached']['js']['behat_editor_saucelabs_settings'] = $path . '/js/behat_editor_saucelabs_settings.js';
+    }
+
+    $forms = array('behat_editor_view_form', 'behat_editor_edit_form', 'behat_editor_add_form');
+    //Deal with other forms
     if(in_array($form_id, $forms)) {
-
+        composer_manager_register_autoloader();
+        $disabled = behat_editor_saucelabs_install_check();
 
         //Hide Run Test button set in variables
         if(variable_get('behat_editor_saucelabs_hide_run') === 1) {
@@ -85,36 +95,17 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
             );
         }
 
-        composer_manager_register_autoloader();
-        if (!class_exists('Drupal\BehatEditorSauceLabs\Wrapper')) {
-            $message = t('SauceLabs Wrapper not found.');
-            throw new \RuntimeException($message);
-        }
-
-        $username = variable_get('behat_editor_saucelabs_username', '');
-        $api_key = variable_get('behat_editor_saucelabs_api', '');
-
-        $check_connection = new Drupal\BehatEditorSauceLabs\Wrapper($username, $api_key);
-        $connected = $check_connection->connectTest();
-
-        if(isset($connected['error']) || empty($username) || empty($api_key)) {
-            $disabled = 'disabled';
-            drupal_set_message(t("Saucelabs connection error: :error The Saucelabs button will be disabled till resolved.", array(':error' => $connected['error'])), 'error');
-            drupal_set_message(t("You can configure SauceLabs here !here", array('!here' => l('configure', 'admin/config/development/behat_saucelabs'))), 'info');
-        } else {
-            $disabled = '';
-        }
-
         $module = arg(3);
         if(empty($module)) {
             $module = BEHAT_EDITOR_DEFAULT_FOLDER;
         }
         $path = drupal_get_path('module', 'behat_editor_saucelabs');
+        $library_path = libraries_get_path('behat_editor_saucelabs_flowplayer'); //@todo use the api better for libraries
         $form['#attached']['js']['behat_editor_saucelabs_run'] = $path . '/js/behat_editor_saucelabs_run.js';
         $form['#attached']['js']['behat_editor_saucelabs_settings'] = $path . '/js/behat_editor_saucelabs_settings.js';
-        $form['#attached']['js']['behat_editor_saucelabs_video'] = $path . '/libraries/flowplayer/flowplayer-3.2.12.min.js';
+        $form['#attached']['js']['behat_editor_saucelabs_video'] = $library_path . '/flowplayer/flowplayer-3.2.12.min.js';
         $form['#attached']['css']['behat_editor_saucelabs_run'] = $path . '/css/app.css';
-        $flow_path = '/' . $path . '/libraries/flowplayer/flowplayer-3.2.16.swf';
+        $flow_path = '/' . $library_path . '/flowplayer/flowplayer-3.2.16.swf';
         drupal_add_js(array('behat_editor_saucelabs' => array('flow_path' => "{$flow_path}")), 'setting');
         $form['actions']['saucelabs_run'] = array(
             '#type' => 'link',
@@ -123,10 +114,58 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
             '#href' => "admin/behat/saucelabs/run/$module/",
             '#attributes' => array('class' => array('sauce', 'btn', 'btn-success', "$disabled"))
         );
-        drupal_set_message('<a href="#" data-toggle="modal" data-target="#slVideo">watch the video</a>');
         behat_editor_saucelabs_video_modal($form);
+        behat_editor_saucelabs_iframe_modal($form);
 
+        //Multi select
+//        $options = array(
+//            'Window' => array('Chrome', 'Firefox', 'IE', 'Opera'),
+//            'Linux' => array('Chrome', 'Firefox', 'Opera'),
+//            'Mac OX' => array('Safari', 'Chrome', 'Firefox', 'Opera'),
+//            'iPad' => array('Safari'),
+//            'iPhone' => array('Safari'),
+//        );
+//        $form['results_area']['settings']['os_browser']['multi'] = array(
+//            '#type' => 'select',
+//            '#multiple' => TRUE,
+//            '#options' => $options,
+//        );
     }
+}
+
+function behat_editor_saucelabs_install_check() {
+    if (!class_exists('Drupal\BehatEditorSauceLabs\Wrapper')) {
+        $message = t('SauceLabs Wrapper not found.');
+        throw new \RuntimeException($message);
+    }
+
+    $username = variable_get('behat_editor_saucelabs_username', '');
+    $api_key = variable_get('behat_editor_saucelabs_api', '');
+
+    $check_connection = new Drupal\BehatEditorSauceLabs\Wrapper($username, $api_key);
+    $connected = $check_connection->connectTest();
+
+    if(isset($connected['error']) || empty($username) || empty($api_key)) {
+        drupal_set_message(t("Saucelabs connection error: :error The Saucelabs button will be disabled till resolved.", array(':error' => $connected['error'])), 'error');
+        drupal_set_message(t("You can configure SauceLabs here !here", array('!here' => l('configure', 'admin/config/development/behat_saucelabs'))), 'info');
+        return 'disabled';
+    } else {
+        drupal_add_js(array('behat_editor_saucelabs' => array('user' => $username, 'token' => $api_key)), 'setting');
+        return FALSE;
+    }
+
+
+}
+
+function behat_editor_saucelabs_iframe_modal(&$form) {
+    $title =  "Sauce Video";
+    $path = drupal_get_path('module', 'behat_editor_saucelabs');
+    $body = '<div id="slIframe" class="span12">
+                    <iframe width="900" height="900" src="http://google.com">Coming soon..</iframe>
+		    </div>';
+
+
+    $form['behat_editor_saucelabs']['#markup'] = behat_editor_modal($title, $body, $buttons = '', 'slIframeModal');
 }
 
 function behat_editor_saucelabs_video_modal(&$form) {
@@ -169,9 +208,15 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
     if($context1 == 'generate_yml') {
-        watchdog('test_drush_settings', print_r($settings, 1));
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];
+
+        if($browser == 'ipad') {
+            $browser = 'iPad';
+            $version = 6;
+            $os = 'OS X 10.8';
+        }
+        $name = 'Behat Tests ';
 
         $username = variable_get('behat_editor_saucelabs_username', '');
         $token = variable_get('behat_editor_saucelabs_api', '');
@@ -183,7 +228,8 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
             'capabilities' => array(
                 "platform" => "$os",
                 'browser' => "$browser",
-                'version' => "$version"
+                'version' => "$version",
+                'name' => "$name"
             )
         );
     }
@@ -224,3 +270,20 @@ function behat_editor_saucelabs_job($job_id) {
 }
 
 
+function behat_editor_saucelabs_libraries_info() {
+    $libraries['behat_editor_saucelabs_flowplayer'] = array(
+        'name' => 'Flow Player for Saucelabs',
+        'vendor url' => 'http://flash.flowplayer.org/',
+        'download url' => 'http://releases.flowplayer.org/flowplayer/flowplayer-3.2.16.zip',
+        'version arguments' => array(
+            'file' => 'flowplayer/flowplayer-3.2.16.min.js',
+            'pattern' => '@flowplayer\s+([0-9a-zA-Z\.-]+)@',
+            'line' => '2'
+        ),
+        'files' => array(
+            'js' => array('flowplayer/flowplayer-3.2.16.min.js'),
+        ),
+    );
+
+    return $libraries;
+}
