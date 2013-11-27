@@ -1,0 +1,49 @@
+<?php
+/**
+ * Implements hook_requirements().
+ *
+ * Make sure libraries are installed
+ */
+
+
+function behat_editor_saucelabs_enable() {
+    //Download library
+    behat_editor_saucelabs_libraries();
+}
+
+function behat_editor_saucelabs_libraries() {
+    $libraries_path = 'sites/all/libraries';
+    $libraries_path = drupal_realpath($libraries_path);
+        chdir($libraries_path);
+        $libraries = behat_editor_saucelabs_libraries_info();
+        foreach($libraries as $key => $value) {
+            if(!drupal_realpath(libraries_get_path($key))) {
+                if(!drupal_mkdir($libraries_path . '/' . $key)) {
+                    drupal_set_message("Could not make libraries folder");
+                    return;
+                } else {
+                    chdir($libraries_path . '/' . $key);
+                    if (!shell_exec('wget ' . $libraries[$key]['download url'] . ' -O file.zip')) {
+                        shell_exec('curl ' . $libraries[$key]['download url'] . ' > file.zip' );
+                    }
+                    if(is_file('file.zip')) {
+                        shell_exec('unzip -qq -o file.zip');
+                        unlink('file.zip');
+                    }
+                }
+            }
+        }
+}
+
+/**
+ *
+ */
+function behat_editor_saucelabs_update_7000() {
+}
+
+/**
+ * Add flowplayer library
+ */
+function behat_editor_saucelabs_update_7001() {
+    behat_editor_saucelabs_libraries();
+}

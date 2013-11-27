@@ -2,6 +2,7 @@
     Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
     Drupal.behat_editor_saucelabs.getOs = function() {
         $( "#edit-os" ).load( "/admin/behat/saucelabs/os", function(data) {
+
             var option_list = jQuery.parseJSON(data);
             var os_list_unique = [];
             $('body').data("sauce_options", option_list);
@@ -9,6 +10,7 @@
                 var os_name = option_list['os'][i]['os'];
                 os_list_unique[os_name] = os_name;
             }
+            //console.log(os_name);
             for(var key in os_list_unique) {
                 var nice_name = os_list_unique[key];
                 $('#edit-os').append($("<option />").val(nice_name).text(nice_name));
@@ -24,6 +26,8 @@
         $('#edit-browser').empty();
         var option_list = $('body').data("sauce_options", option_list);
         for(var i = 0; i < option_list['os'].length; i++) {
+            //console.log(option_list['os'][i]);
+
             var os_name = option_list['os'][i]['os'];
                 if(os_name == os) {
                     var browser_name = option_list['os'][i]['long_name'];

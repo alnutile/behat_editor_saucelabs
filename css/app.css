@@ -1,3 +1,23 @@
 #edit-actions a#edit-saucelabs-run {
     width: 154px;
 }
+
+#slIframeModal {
+    width: 1065px;
+}
+
+#slIframeModal .modal-dialog {
+    width: 1020px;
+}
+
+#sl-video {
+    margin: auto;
+}
+
+a#sl-modal-iframe-button {
+    margin-left: 42%; /*@todo use bootstrap for this */
+}
+
+div.form-item-multi select {
+    height: 400px;
+}
