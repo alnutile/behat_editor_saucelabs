@@ -2,6 +2,18 @@
 
 
     Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
+
+    Drupal.behat_editor_saucelabs.cleanup = function() {
+        if($('div.sl-running')) {
+            $('div.saving-tests').fadeOut().remove();
+            $('div.sl-running').fadeOut();
+            $('div.sl-progress').fadeOut().remove();
+            $('div.sl-video-block').fadeOut().remove();
+            $('a#download-video').fadeOut().remove();
+            $('div.modal-iframe').fadeOut().remove();
+        }
+    };
+
     Drupal.behat_editor_saucelabs.saucelabs_check = function(tries, starting_job_id) {
         var max_tries = 10;
         tries = typeof tries !== 'undefined' ? tries : 1;
@@ -39,7 +51,7 @@
                 var id = data.latest_id;
                 var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">Job is here</a>';
                 var status = data.latest_job.status;
-                Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"', 'success');
+                //Drupal.behat_editor.renderMessageCustom('New SauceLabs job info id ' +id+ ' @ ' +url+ '. Status of the job is "' +status+'"', 'success');
                 Drupal.behat_editor_saucelabs.getJobInfo(id, 0);
             } else {
                 Drupal.behat_editor.renderMessageCustom('We have reached the mx tries  '+ tries + ' of ' + max_tries + '<br>' +
@@ -52,11 +64,13 @@
 
     Drupal.behat_editor_saucelabs.video = function(job_id) {
         var session_id = job_id;
-        var user_name = 'alfrednutile2';
-        var api_key = '3e3289cc-b519-43c3-8393-d61438bb20f2';
-        //http://saucelabs.com/video-embed/a09c982f3dcb43459d658a35da21266b.js?username=alfrednutile2&access_key=3e3289cc-b519-43c3-8393-d61438bb20f2
-        //var video_script = '<script type="text/javascript" src="http://saucelabs.com/video-embed/'+session_id+'.js?username='+user_name+'&access_key='+api_key+'"/></script>';
-        //return video_script;
+        var user_name,
+            api_key;
+        if(Drupal.settings.behat_editor_saucelabs) {
+            user_name = Drupal.settings.behat_editor_saucelabs.user;
+            api_key = Drupal.settings.behat_editor_saucelabs.token;
+        }
+        return [ { "user": user_name, "token": api_key }]
     };
 
     Drupal.behat_editor_saucelabs.getJobInfo = function(job_id, run) {
@@ -74,19 +88,30 @@
                 if($('div.sl-progress').length) {
                     $('div.sl-progress').fadeOut().remove();
                 }
-                var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">here</a>';
 
-                var message = "<div class='alert alert-info sl-progress'>";
-                message += "<h3>Your Saucelabs job is in progress</h3>" +
-                    "<small>a video will be available on this page when done</small><br>" +
-                    "<small>but you can see the job "+url+" as if you have an account</small>";
+                //Setup iframe modal
+                var iframe_url = 'https://saucelabs.com/tests/'+ id;
+                $('#slIframe iframe').attr('src', iframe_url);
+                //$('#messages-behat').append('<br><button class="btn btn-primary btn-md" data-toggle="modal" data-target="#slIframeModal">watch video</button>');
+                var iframe_button = '<div class="alert alert-info center-block modal-iframe"><a id="sl-modal-iframe-button" href="#">watch video</a></div>';
+
+                //Setup progress bar
+                var url = '<a href="https://saucelabs.com/tests/'+ id + '" target="_blank" class="btn btn-success">here</a>';
+                var message = "<div class='alert alert-default sl-progress'>";
+                message += "<h3>Your Saucelabs job is in progress</h3><br>";
                 message += '<div class="progress progress-striped active">';
                 message += '<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="'+status+'" aria-valuemin="0" aria-valuemax="100" style="width: '+status+'%">';
                 message += '</div>';
+                //message += iframe_button;
                 message += '</div>';
                 //message += '<a id="watch-video" href="#" data-toggle="modal" data-target="#slVideo" data-job-id="'+id+'">watch the video</a>';
                 message += '</div>';
+
                 $('#messages-behat').append(message);
+
+                $('#messages-behat').append(iframe_button);
+
+
 
             } else {
                 $('div.sl-progress div.progress-bar-info').attr('aria-valuenow', status);
@@ -102,12 +127,12 @@
                 $('div.sl-progress h3').fadeOut('slow').text("SauceLabs is now 100% complete").fadeIn('slow');
                 var video_url = "https://saucelabs.com/video-embed/"+job_id+".js?username=alfrednutile2&access_key=3e3289cc-b519-43c3-8393-d61438bb20f2";
                 var video_url = "https://saucelabs.com/jobs/"+job_id+"/video.flv?username=alfrednutile2&access_key=3e3289cc-b519-43c3-8393-d61438bb20f2";
-                var video = '<a href="'+video_url+'" ' +
-                    'style="display:block;width:520px;height:330px"' +
-                    'id="sl-video"></a>';
+                var video = '<div class="center-block sl-video-block">' +
+                              '<a href="'+video_url+'" style="display:block;width:520px;height:330px" id="sl-video"></a>' +
+                            '</div>';
                 $('#messages-behat').append(video);
                 //data.job.video_url
-                $('#messages-behat').append('<br></a><a class="btn btn-warning btn-lg"  role="button" id="download-video" href="'+data.job.video_url+'" target="_blank" data-job-id="'+id+'">download video</a>');
+                $('#messages-behat').append('<br><a class="btn btn-success btn-md btn-block"  role="button" id="download-video" href="'+data.job.video_url+'" target="_blank" data-job-id="'+id+'">download video</a>');
                 flowplayer("sl-video", Drupal.settings.behat_editor_saucelabs.flow_path);
             };
         });
@@ -124,10 +149,18 @@
                 $(player).appendTo('div#slPlayer div.video');
             });
 
+            //@todo get live out and replace as it should be
+            $('a#sl-modal-iframe-button', context).live('click', function(e){
+                e.preventDefault();
+                $('#slIframeModal', context).modal('toggle').css({'margin': 'auto'})
+            });
+
+
             $('a.sauce').click(function(e){
                 //Drupal.behat_editor.buttons('disable');
                 e.preventDefault();
                 if(!$(this).hasClass('disabled')) {
+                    Drupal.behat_editor_saucelabs.cleanup();
                     var method = 'view-mode';
                     if ($('ul.scenario').attr('data-mode')) {
                         method = $('ul.scenario').data('mode');
