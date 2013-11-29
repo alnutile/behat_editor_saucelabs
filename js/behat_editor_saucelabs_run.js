@@ -62,16 +62,6 @@
         }
     };
 
-    Drupal.behat_editor_saucelabs.video = function(job_id) {
-        var session_id = job_id;
-        var user_name,
-            api_key;
-        if(Drupal.settings.behat_editor_saucelabs) {
-            user_name = Drupal.settings.behat_editor_saucelabs.user;
-            api_key = Drupal.settings.behat_editor_saucelabs.token;
-        }
-        return [ { "user": user_name, "token": api_key }]
-    };
 
     Drupal.behat_editor_saucelabs.getJobInfo = function(job_id, run) {
         $.getJSON('/admin/behat/saucelabs/job/' + job_id, function(data){
@@ -81,10 +71,11 @@
             progress["in progress"] = '75';
             progress["complete"] = '100';
             var status = progress[data.job.status];
-
+            var api_info = Drupal.behat_editor_saucelabs.api_info(id);
+            console.log(api_info);
             if(run === 0) {
                 var id = data.job.id;
-                var script_video = Drupal.behat_editor_saucelabs.video(id);
+
                 if($('div.sl-progress').length) {
                     $('div.sl-progress').fadeOut().remove();
                 }
@@ -125,8 +116,10 @@
 
             if(data.job.status == 'complete') {
                 $('div.sl-progress h3').fadeOut('slow').text("SauceLabs is now 100% complete").fadeIn('slow');
-                var video_url = "https://saucelabs.com/video-embed/"+job_id+".js?username=alfrednutile2&access_key=3e3289cc-b519-43c3-8393-d61438bb20f2";
-                var video_url = "https://saucelabs.com/jobs/"+job_id+"/video.flv?username=alfrednutile2&access_key=3e3289cc-b519-43c3-8393-d61438bb20f2";
+                //@todo oops this was not suppose to be left here. There is a settings call above to get these to use here
+                //  remove and clean up by moving settings function into settings js file
+                //var video_url = "https://saucelabs.com/video-embed/"+job_id+".js?username="+api_info.user_name+"&access_key="+api_info.token+"";
+                var video_url = "https://saucelabs.com/jobs/"+job_id+"/video.flv?username="+api_info.user_name+"&access_key="+api_info.token+"";
                 var video = '<div class="center-block sl-video-block">' +
                               '<a href="'+video_url+'" style="display:block;width:520px;height:330px" id="sl-video"></a>' +
                             '</div>';

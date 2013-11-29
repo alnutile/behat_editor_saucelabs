@@ -22,6 +22,20 @@
         });
     };
 
+    Drupal.behat_editor_saucelabs.api_info = function(job_id) {
+        var session_id = job_id;
+        var user_name,
+            api_key;
+        if(Drupal.settings.behat_editor_saucelabs) {
+            user_name = Drupal.settings.behat_editor_saucelabs.user;
+            api_key = Drupal.settings.behat_editor_saucelabs.token;
+        }
+        var api = {}
+        api.user_name = user_name;
+        api.token = api_key;
+        return api;
+    };
+
     Drupal.behat_editor_saucelabs.getBrowser = function(os) {
         $('#edit-browser').empty();
         var option_list = $('body').data("sauce_options", option_list);
