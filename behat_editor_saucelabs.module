@@ -73,7 +73,7 @@ function behat_editor_saucelabs_menu() {
 }
 
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
-
+    dpm($form);
     //Deal with Bulk Interface / Batch API
     $form_batch = array('behat_editor_bulk_form_tags', 'behat_editor_bulk_form_modules');
     if(in_array($form_id, $form_batch)) {
@@ -118,18 +118,20 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
         behat_editor_saucelabs_iframe_modal($form);
 
         //Multi select
-//        $options = array(
-//            'Window' => array('Chrome', 'Firefox', 'IE', 'Opera'),
-//            'Linux' => array('Chrome', 'Firefox', 'Opera'),
-//            'Mac OX' => array('Safari', 'Chrome', 'Firefox', 'Opera'),
-//            'iPad' => array('Safari'),
-//            'iPhone' => array('Safari'),
-//        );
-//        $form['results_area']['settings']['os_browser']['multi'] = array(
-//            '#type' => 'select',
-//            '#multiple' => TRUE,
-//            '#options' => $options,
-//        );
+        $options = array(
+            'Window' => drupal_map_assoc(array('Chrome', 'Firefox', 'IE', 'Opera')),
+            'Linux' => drupal_map_assoc(array('Chrome', 'Firefox', 'Opera')),
+            'OS X' => drupal_map_assoc(array('Safari', 'Chrome', 'Firefox', 'Opera')),
+            'iPad' => drupal_map_assoc(array('Safari')),
+            'iPhone' => drupal_map_assoc(array('Safari')),
+        );
+        $form['results_area']['settings']['os_browser']['multi'] = array(
+            '#type' => 'select',
+            '#title' => t('Only on Saucelabs'),
+            '#description' => t('Chose a combination of Browser and OS to run on Saucelabs'),
+            '#multiple' => TRUE,
+            '#options' => $options,
+        );
     }
 }
 
@@ -190,9 +192,10 @@ function behat_editor_saucelabs_video_modal(&$form) {
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1){
-
+    watchdog('test_command', print_r(implode($command), 1));
     //context behat_run we leave alone for now
     if($context1 == 'behat_run_saucelabs') {
+
         //watchdog("behat_editor_saucelabs", t('Running tests for @context', array('@context' => $context1)));
         //Already set in the exec function
         //$command['profile'] = "--profile=saucelabs";
@@ -207,6 +210,7 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
+    watchdog('test_settings', print_r($settings, 1));
     if($context1 == 'generate_yml') {
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];

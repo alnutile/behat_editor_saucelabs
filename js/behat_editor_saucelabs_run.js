@@ -72,7 +72,6 @@
             progress["complete"] = '100';
             var status = progress[data.job.status];
             var api_info = Drupal.behat_editor_saucelabs.api_info(id);
-            console.log(api_info);
             if(run === 0) {
                 var id = data.job.id;
 
@@ -164,6 +163,7 @@
                     var base_url_gsid = $('select#edit-group option:selected').val();
                     var os_version = $('select#edit-os option:selected').val();
                     var browser_version = $('select#edit-browser option:selected').val();
+
                     var parameters = {
                         "method": method,
                         "scenario[]": scenario_array,
