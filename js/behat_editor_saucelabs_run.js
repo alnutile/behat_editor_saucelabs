@@ -1,5 +1,23 @@
 (function ($) {
 
+    //@todo move this into the default module
+    Drupal.behat_editor = Drupal.behat_editor || {};
+    Drupal.behat_editor.get_selected_os_browser = function(select_items) {
+        if($('#edit-multi-os-browser')) {
+            var options = [];
+            var count = 0;
+            $('#edit-multi-os-browser option:selected', select_items).each(function(){
+                var label=$(this).parent().attr('label');
+                var version = $(this).val();
+                options[count] = [ { "os": label, "version": version}];
+                count++;
+            });
+            return options;
+        } else {
+            return false;
+        }
+    }
+
 
     Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
 
@@ -72,7 +90,6 @@
             progress["complete"] = '100';
             var status = progress[data.job.status];
             var api_info = Drupal.behat_editor_saucelabs.api_info(id);
-            console.log(api_info);
             if(run === 0) {
                 var id = data.job.id;
 
@@ -162,8 +179,10 @@
                     var scenario_array = Drupal.behat_editor.make_scenario_array(scenario);
                     var base_url_usid = $('select#edit-users option:selected').val();
                     var base_url_gsid = $('select#edit-group option:selected').val();
+                    var multi_browser_os = Drupal.behat_editor.get_selected_os_browser($('#edit-multi-os-browser'));
                     var os_version = $('select#edit-os option:selected').val();
                     var browser_version = $('select#edit-browser option:selected').val();
+
                     var parameters = {
                         "method": method,
                         "scenario[]": scenario_array,
@@ -171,7 +190,8 @@
                             "base_url_usid": base_url_usid,
                             "base_url_gsid": base_url_gsid,
                             "os_version": os_version,
-                            "browser_version": browser_version
+                            "browser_version": browser_version,
+                            "multi_browser_os": multi_browser_os
                         }
                     };
                     var url = $(this).attr('href');
