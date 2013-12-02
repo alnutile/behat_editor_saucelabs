@@ -90,8 +90,8 @@
         if($('#edit-multi-os-browser').length) {
             $('#edit-multi-os-browser').empty();
             Drupal.behat_editor_saucelabs.getOsMulti();
-            Drupal.behat_editor_saucelabs.getOs();
         }
+        Drupal.behat_editor_saucelabs.getOs();
         $('#edit-os').on('change', function(){
             var selectedOs = $("option:selected", this).val();
             Drupal.behat_editor_saucelabs.getBrowser(selectedOs);
