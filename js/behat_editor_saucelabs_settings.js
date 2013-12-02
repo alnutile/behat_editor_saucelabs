@@ -21,7 +21,7 @@
     };
 
     Drupal.behat_editor_saucelabs.getOsMulti = function() {
-        $( "#edit-multi" ).load( "/admin/behat/saucelabs/os", function(data) {
+        $( "#edit-multi-os-browser" ).load( "/admin/behat/saucelabs/os", function(data) {
             var option_list = jQuery.parseJSON(data);
             var os_list_unique = [];
             $('body').data("sauce_options", option_list);
@@ -31,7 +31,7 @@
             }
             for(var key in os_list_unique) {
                 var nice_name = os_list_unique[key];
-                $('#edit-multi').append($("<optgroup label='"+nice_name+"' />").val(nice_name).text(nice_name));
+                $('#edit-multi-os-browser').append($("<optgroup label='"+nice_name+"' />").val(nice_name).text(nice_name));
                 Drupal.behat_editor_saucelabs.getBrowserMulti(nice_name);
             }
         });
@@ -59,10 +59,10 @@
                 var browser_name = option_list['os'][i]['long_name'];
                 var api_name = option_list['os'][i]['api_name'];
                 var short_version = option_list['os'][i]['short_version'];
-                if($('#edit-multi optgroup[label="'+os_name+'"] option[value="'+api_name+'|'+short_version+'"').val() === undefined) {
-                    $('#edit-multi optgroup[label="'+os_name+'"]').append($("<option />").val(api_name+'|'+short_version).text(browser_name + ' - ' + short_version + ' (selenium_name: '+api_name+')'));
+                if($('#edit-multi-os-browser optgroup[label="'+os_name+'"] option[value="'+api_name+'|'+short_version+'"').val() === undefined) {
+                    $('#edit-multi-os-browser optgroup[label="'+os_name+'"]').append($("<option />").val(api_name+'|'+short_version).text(browser_name + ' - ' + short_version + ' (selenium_name: '+api_name+')'));
                     if(os_name == 'Windows 2012' && browser_name == 'Internet Explorer') {
-                        $('#edit-multi optgroup[label="'+os_name+'"] option[value="'+api_name+'|'+short_version+'"]').attr('selected', 'selected');
+                        $('#edit-multi-os-browser optgroup[label="'+os_name+'"] option[value="'+api_name+'|'+short_version+'"]').attr('selected', 'selected');
                     }
                 }
             }
@@ -87,9 +87,11 @@
 
     Drupal.behaviors.behat_editor_saucelabs = {};
     Drupal.behaviors.behat_editor_saucelabs.attach = function(context) {
-        $('#edit-multi').empty();
-        Drupal.behat_editor_saucelabs.getOsMulti();
-        Drupal.behat_editor_saucelabs.getOs();
+        if($('#edit-multi-os-browser').length) {
+            $('#edit-multi-os-browser').empty();
+            Drupal.behat_editor_saucelabs.getOsMulti();
+            Drupal.behat_editor_saucelabs.getOs();
+        }
         $('#edit-os').on('change', function(){
             var selectedOs = $("option:selected", this).val();
             Drupal.behat_editor_saucelabs.getBrowser(selectedOs);

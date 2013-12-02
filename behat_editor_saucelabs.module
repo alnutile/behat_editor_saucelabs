@@ -73,7 +73,6 @@ function behat_editor_saucelabs_menu() {
 }
 
 function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
-    dpm($form);
     //Deal with Bulk Interface / Batch API
     $form_batch = array('behat_editor_bulk_form_tags', 'behat_editor_bulk_form_modules');
     if(in_array($form_id, $form_batch)) {
@@ -118,20 +117,23 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
         behat_editor_saucelabs_iframe_modal($form);
 
         //Multi select
-        $options = array(
-            'Window' => drupal_map_assoc(array('Chrome', 'Firefox', 'IE', 'Opera')),
-            'Linux' => drupal_map_assoc(array('Chrome', 'Firefox', 'Opera')),
-            'OS X' => drupal_map_assoc(array('Safari', 'Chrome', 'Firefox', 'Opera')),
-            'iPad' => drupal_map_assoc(array('Safari')),
-            'iPhone' => drupal_map_assoc(array('Safari')),
-        );
-        $form['results_area']['settings']['os_browser']['multi'] = array(
-            '#type' => 'select',
-            '#title' => t('Only on Saucelabs'),
-            '#description' => t('Chose a combination of Browser and OS to run on Saucelabs'),
-            '#multiple' => TRUE,
-            '#options' => $options,
-        );
+        //@todo not being used for now.
+        //  maybe later in the batch area
+//        $options = array(
+//            'Window' => drupal_map_assoc(array('Chrome', 'Firefox', 'IE', 'Opera')),
+//            'Linux' => drupal_map_assoc(array('Chrome', 'Firefox', 'Opera')),
+//            'OS X' => drupal_map_assoc(array('Safari', 'Chrome', 'Firefox', 'Opera')),
+//            'iPad' => drupal_map_assoc(array('Safari')),
+//            'iPhone' => drupal_map_assoc(array('Safari')),
+//        );
+//
+//        $form['results_area']['settings']['os_browser']['multi-os-browser'] = array(
+//            '#type' => 'select',
+//            '#title' => t('Only on Saucelabs'),
+//            '#description' => t('Chose a combination of Browser and OS to run on Saucelabs'),
+//            '#multiple' => TRUE,
+//            '#options' => $options,
+//        );
     }
 }
 
@@ -163,7 +165,7 @@ function behat_editor_saucelabs_iframe_modal(&$form) {
     $title =  "Sauce Video";
     $path = drupal_get_path('module', 'behat_editor_saucelabs');
     $body = '<div id="slIframe" class="span12">
-                    <iframe width="900" height="900" src="http://google.com">Coming soon..</iframe>
+                    <iframe width="900" height="900" src="">Coming soon..</iframe>
 		    </div>';
 
 
@@ -192,7 +194,6 @@ function behat_editor_saucelabs_video_modal(&$form) {
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1){
-    watchdog('test_command', print_r(implode($command), 1));
     //context behat_run we leave alone for now
     if($context1 == 'behat_run_saucelabs') {
 
@@ -210,8 +211,12 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
-    watchdog('test_settings', print_r($settings, 1));
+    //watchdog('test_settings', print_r($settings, 1));
     if($context1 == 'generate_yml') {
+        $name = 'Behat Tests ';
+        $username = variable_get('behat_editor_saucelabs_username', '');
+        $token = variable_get('behat_editor_saucelabs_api', '');
+
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];
 
@@ -220,10 +225,7 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
             $version = 6;
             $os = 'OS X 10.8';
         }
-        $name = 'Behat Tests ';
 
-        $username = variable_get('behat_editor_saucelabs_username', '');
-        $token = variable_get('behat_editor_saucelabs_api', '');
         $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
@@ -236,6 +238,30 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
                 'name' => "$name"
             )
         );
+
+        //Loops through settings and make a new section in the yml file for each settings
+        //  later in the exec the same loop and key combination will run each test
+        //@todo this will be used for batch work only coming later
+        $name = 'test_name_coming_soon.feature';
+        if(isset($settings['multi_browser_os'])) {
+                foreach($settings['multi_browser_os'] as $key => $value) {
+                    $os = $value[0]['os'];
+                    list($browser, $version) = explode("|", $value[0]['version']);
+                    $browser_version = str_replace(array(' ', '.'), '_', "{$browser}_{$version}");
+                    $behat_yml[$browser_version]['context']['class'] = 'FeatureContext';
+                    $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
+                    $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
+                        'browser' => $browser,
+                        'wd_host' => "{$username}:{$token}@ondemand.saucelabs.com/wd/hub",
+                        'capabilities' => array(
+                            "platform" => "$os",
+                            'browser' => "$browser",
+                            'version' => "$version",
+                            'name' => "Behat Test {$browser} {$version} for $name"
+                        )
+                    );
+                }
+        }
     }
 }
 
