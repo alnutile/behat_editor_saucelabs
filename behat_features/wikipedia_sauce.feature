@@ -1,8 +1,10 @@
- 
+ @javascript
  Feature: Example Test for WikiPedia
  
    Scenario: WikiPedia
      Given I am on "http://en.wikipedia.org/wiki/Main_Page"
+     And I wait
+     And I wait
      Then the element "#mp-tfa" should have style "10px"
      Then the element "#mp-tfa" should have style "5px"
      Then I should see "WikiPedia"
