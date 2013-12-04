@@ -1,49 +1,15 @@
 default:
-  context:
-    class:  'FeatureContext'
+  paths:
+    features: 'features'
   extensions:
     Behat\MinkExtension\Extension:
-      base_url:  'http://www.advil.com/'
+      goutte: ~
+      selenium2: ~
+      base_url: http://behateditor.stagingarea.us
+      browser_name: firefox
       javascript_session:  'selenium2'
-      goutte:              ~
-      selenium2:
-
-
-subcontexts:
-  context:
-    class:      'SubContext'
-
-
-
-Webdriver-saucelabs:
-  context:
-    class:  'FeatureContext'
-  extensions:
-    Behat\MinkExtension\Extension:
-      default_session: selenium2
-      selenium2:
-        browser: firefox
-        wd_host: USER_NAME:API_KEY@ondemand.saucelabs.com/wd/hub
-        capabilities: { "platform": "VISTA", "browser": "firefox", "version": "7"}
-
-
-
-Selenium-saucelabs2:
-  context:
-    class:  'FeatureContext'
-  extensions:
-    Behat\MinkExtension\Extension:
-      base_url:  'http://example.com/'
-      javascript_session:  'selenium'
-      selenium:
-        host: ondemand.saucelabs.com
-        port: 80
-        browser: >
-          {
-            "username":         "USER_NAME",
-            "access-key":       "API_KEY",
-            "browser":          "firefox",
-            "browser-version":  "7",
-            "os":               "Windows 2003",
-            "name":             "Testing Selenium with Behat"
-          }
+    Drupal\DrupalExtension\Extension:
+      blackbox: ~
+      subcontexts:
+              paths:
+                - "/full/path/here/to/search/for/sub/context/files/named/module_name/behat/inc"
