@@ -1,11 +1,6 @@
 After you enable the module you will need to visit composer_manager [admin/config/system/composer-manager]
 and allow it to rebuild composer.json from the composer.json file in this modules folder.
 
-11-21-13
-You will need to patch the vendor file located at
-vendor/instaclick/php-webdriver/lib/WebDriver/SauceLabs/SauceRest.php
-using the SauceRest.diff in the root of this modules directory.
-I will update this once that fork is merged in.
 
 After that you need to put your Saucelabs info into the admin area here
 [admin/config/system/behat-editor/sauce-labs]
