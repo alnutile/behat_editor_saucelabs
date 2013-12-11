@@ -195,11 +195,12 @@ function behat_editor_saucelabs_video_modal(&$form) {
  */
 function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1){
     //context behat_run we leave alone for now
-    if($context1 == 'behat_run_saucelabs') {
+    watchdog("behat_editor_saucelabs", t('Running tests for @context', array('@context' => $context1)));
+    if($context1 == 'behat_run_batch') {
 
         //watchdog("behat_editor_saucelabs", t('Running tests for @context', array('@context' => $context1)));
         //Already set in the exec function
-        //$command['profile'] = "--profile=saucelabs";
+        $command['profile'] = "--profile=saucelabs";
     }
 }
 
