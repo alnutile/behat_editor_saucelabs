@@ -6,7 +6,7 @@
  */
 
 
-function behat_editor_saucelabs_enable() {
+function behat_editor_saucelabs_install() {
     //Download library
     behat_editor_saucelabs_libraries();
 }
