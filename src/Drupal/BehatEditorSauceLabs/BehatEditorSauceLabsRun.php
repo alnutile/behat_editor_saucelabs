@@ -68,7 +68,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
      * @param string $profile
      * @return array
      */
-    public function execDrush($javascript = FALSE, $tag_include = FALSE, $profile = 'default', $settings = array()) {
+    public function execDrush($javascript = FALSE, $tag_include = FALSE, $profile = 'default', $settings = array(), $context1 = 'behat_run_saucelabs') {
         if($javascript == TRUE) {
             $tags_exclude = '';
         } else {
@@ -86,6 +86,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command = self::behatCommandArray();
 
         //@todo move this into a shared method for exec and execDrush
+        $this->settings['context'] = $context1;
         $behat_yml_path = new BehatEditor\GenerateBehatYml($this->settings);
         $this->behat_yml = $behat_yml_path->writeBehatYmlFile();
 
