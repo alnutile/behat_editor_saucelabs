@@ -15,7 +15,7 @@
         "issues": "https://github.com/alnutile/behat_editor_saucelabs/issues"
     },
     "require": {
-        "behat/behat": "2.4.*@stable"
+        "behat/behat": "*"
     },
     "autoload": {
         "psr-0": {
