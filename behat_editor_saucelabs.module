@@ -197,9 +197,6 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
     //context behat_run we leave alone for now
     watchdog("behat_editor_saucelabs", t('Running tests for @context', array('@context' => $context1)));
     if($context1 == 'behat_run_batch') {
-
-        //watchdog("behat_editor_saucelabs", t('Running tests for @context', array('@context' => $context1)));
-        //Already set in the exec function
         $command['profile'] = "--profile=saucelabs";
     }
 }
@@ -212,7 +209,7 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
-    //watchdog('test_settings', print_r($settings, 1));
+
     if($context1 == 'generate_yml') {
         $name = 'Behat Tests ';
         $username = variable_get('behat_editor_saucelabs_username', '');
@@ -221,11 +218,13 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];
 
-        if($browser == 'ipad') {
+        if ($browser == 'ipad') {
             $browser = 'iPad';
             $version = 6;
             $os = 'OS X 10.8';
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['selenium-version'] = '~';
         }
+
 
         $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
@@ -239,6 +238,11 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
                 'name' => "$name"
             )
         );
+
+        if ($settings['context'] == 'behat_run_batch') {
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['command-timeout'] = '600';
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['max-duration'] = '600';
+        }
 
         //Loops through settings and make a new section in the yml file for each settings
         //  later in the exec the same loop and key combination will run each test
