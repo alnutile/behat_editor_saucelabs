@@ -240,8 +240,8 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
         );
 
         if ($settings['context'] == 'behat_run_batch') {
-            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['command-timeout'] = '600';
-            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['max-duration'] = '600';
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['command-timeout'] = '900';
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['max-duration'] = '900';
         }
 
         //Loops through settings and make a new section in the yml file for each settings
