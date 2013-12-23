@@ -11,7 +11,18 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $this->yml_path = drupal_realpath($path) . '/behat/behat.yml';
     }
 
-    public function exec($javascript = FALSE, $settings = array()) {
+
+    /**
+     * @todo
+     *  this might not be needed any more if it could just use the parent::exec
+     *  since the rewrite of the yml work it might be possible now
+     *
+     * @param bool $javascript
+     * @param array $settings
+     * @param string $context1
+     * @return array
+     */
+    public function exec($javascript = FALSE, $settings = array(), $context1 = 'behat_run_saucelabs') {
         composer_manager_register_autoloader();
         if($javascript == TRUE) {
             $tags = '';
@@ -24,6 +35,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command = parent::behatCommandArray();
 
         //@todo move this into a shared method for exec and execDrush
+        $this->settings['context'] = $context1;
         $behat_yml_path = new BehatEditor\GenerateBehatYml($this->settings);
         $this->behat_yml = $behat_yml_path->writeBehatYmlFile();
 
@@ -33,7 +45,6 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command['config'] = "--config=\"$this->behat_yml\"";
         $command['tags'] = '';
         $command['profile'] = "--profile=saucelabs";
-        $context1 = 'behat_run_saucelabs';
         drupal_alter('behat_editor_command', $command, $context1);
         $command = implode(' ', $command);
 
