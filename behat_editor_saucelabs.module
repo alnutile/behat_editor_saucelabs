@@ -209,9 +209,10 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
-
     if($context1 == 'generate_yml') {
-        $name = 'Behat Tests ';
+        $filename = (isset($settings['filename'])) ? $settings['filename'] : $context1;
+        $module = (isset($settings['module'])) ? $settings['module'] : $context1 ;
+        $name = 'Behat Tests Module:' . $module . ' Filename: ' . $filename ;
         $username = variable_get('behat_editor_saucelabs_username', '');
         $token = variable_get('behat_editor_saucelabs_api', '');
 
@@ -247,7 +248,6 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
         //Loops through settings and make a new section in the yml file for each settings
         //  later in the exec the same loop and key combination will run each test
         //@todo this will be used for batch work only coming later
-        $name = 'test_name_coming_soon.feature';
         if(isset($settings['multi_browser_os'])) {
                 foreach($settings['multi_browser_os'] as $key => $value) {
                     $os = $value[0]['os'];
