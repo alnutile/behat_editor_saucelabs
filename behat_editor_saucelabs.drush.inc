@@ -84,7 +84,6 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
         $pass_fail = 0;
     }
     composer_manager_register_autoloader();
-    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
 
     $file = new Drupal\BehatEditor\File(array(), $module, $filename, FALSE);
     $file_object = $file->get_file_info();
@@ -116,7 +115,6 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
 //@todo fix this it has fell behind other code
 function drush_behat_editor_behat_run_sauce_folder() {
     print "Running Tests...\n";
-    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
     composer_manager_register_autoloader();
     //@todo validate args
     $module = func_get_arg(0);

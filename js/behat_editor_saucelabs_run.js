@@ -167,6 +167,7 @@
 
 
             $('a.sauce').click(function(e){
+                var token = Drupal.behat_editor.get_token();
                 //Drupal.behat_editor.buttons('disable');
                 e.preventDefault();
                 if(!$(this).hasClass('disabled')) {
@@ -182,7 +183,11 @@
                     var multi_browser_os = Drupal.behat_editor.get_selected_os_browser($('#edit-multi-os-browser'));
                     var os_version = $('select#edit-os option:selected').val();
                     var browser_version = $('select#edit-browser option:selected').val();
-
+                    var url_args = window.location.pathname;
+                    var url_args_array = url_args.split('/');
+                    var service_path = url_args_array.slice(4, url_args_array.length);
+                    var module = url_args_array[4];
+                    var filename = url_args_array[url_args_array.length - 1];
                     var parameters = {
                         "method": method,
                         "scenario[]": scenario_array,
@@ -191,14 +196,18 @@
                             "base_url_gsid": base_url_gsid,
                             "os_version": os_version,
                             "browser_version": browser_version,
-                            "multi_browser_os": multi_browser_os
+                            "multi_browser_os": multi_browser_os,
+                            "module": module,
+                            "filename": filename,
+                            "path": service_path,
+                            "context": 'behat_run_saucelabs'
                         }
                     };
                     var url = $(this).attr('href');
-                    var filename = $('input[name=filename]').val();
                     var urlFilename = url + filename;
                     var latestId = '';
                     var data = {};
+                    //@todo use the default run end point
                     var getID = $.getJSON('/admin/behat/saucelabs/jobs', function(data){
                         latestId = data.latest_id;
                         Drupal.behat_editor_saucelabs.saucelabs_check(1, latestId);
