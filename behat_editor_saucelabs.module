@@ -210,6 +210,9 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
     if($context1 == 'generate_yml') {
+        /**
+         * needed to set some things for these but not android
+         */
         $mobile_devices = array('iPad', 'iPhone', 'ipad', 'iphone');
 
         $filename = (isset($settings['filename'])) ? $settings['filename'] : $context1;
@@ -220,17 +223,6 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
 
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];
-
-        if ($browser == 'ipad') {
-            $browser = 'iPad';
-            $version = 6;
-            $os = 'OS X 10.8';
-        }
-
-//        if($browser == 'iphone') {
-//            $browser = 'iPhone';
-//        }
-
 
         $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
