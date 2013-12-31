@@ -209,22 +209,20 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  * @param $context1
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
-
     if($context1 == 'generate_yml') {
-        $name = 'Behat Tests ';
+        /**
+         * needed to set some things for these but not android
+         */
+        $mobile_devices = array('iPad', 'iPhone', 'ipad', 'iphone');
+
+        $filename = (isset($settings['filename'])) ? $settings['filename'] : $context1;
+        $module = (isset($settings['module'])) ? $settings['module'] : $context1 ;
+        $name = 'Behat Tests Module:' . $module . ' Filename: ' . $filename ;
         $username = variable_get('behat_editor_saucelabs_username', '');
         $token = variable_get('behat_editor_saucelabs_api', '');
 
         list($browser, $version) = explode("|", $settings['browser_version']);
         $os = $settings['os_version'];
-
-        if ($browser == 'ipad') {
-            $browser = 'iPad';
-            $version = 6;
-            $os = 'OS X 10.8';
-            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['selenium-version'] = '~';
-        }
-
 
         $behat_yml['saucelabs']['context']['class'] = 'FeatureContext';
         $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
@@ -239,33 +237,42 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
             )
         );
 
+        /**
+         * Setup some duration defaults for batchjobs only
+         */
         if ($settings['context'] == 'behat_run_batch') {
             $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['command-timeout'] = '600';
             $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['max-duration'] = '600';
         }
 
+        /**
+         * Setup some mobile defaults
+         */
+        if (in_array($browser, $mobile_devices)) {
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['selenium-version'] = '';
+        }
+
         //Loops through settings and make a new section in the yml file for each settings
         //  later in the exec the same loop and key combination will run each test
         //@todo this will be used for batch work only coming later
-        $name = 'test_name_coming_soon.feature';
         if(isset($settings['multi_browser_os'])) {
-                foreach($settings['multi_browser_os'] as $key => $value) {
-                    $os = $value[0]['os'];
-                    list($browser, $version) = explode("|", $value[0]['version']);
-                    $browser_version = str_replace(array(' ', '.'), '_', "{$browser}_{$version}");
-                    $behat_yml[$browser_version]['context']['class'] = 'FeatureContext';
-                    $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
-                    $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
-                        'browser' => $browser,
-                        'wd_host' => "{$username}:{$token}@ondemand.saucelabs.com/wd/hub",
-                        'capabilities' => array(
-                            "platform" => "$os",
-                            'browser' => "$browser",
-                            'version' => "$version",
-                            'name' => "Behat Test {$browser} {$version} for $name"
-                        )
-                    );
-                }
+            foreach($settings['multi_browser_os'] as $key => $value) {
+                $os = $value[0]['os'];
+                list($browser, $version) = explode("|", $value[0]['version']);
+                $browser_version = str_replace(array(' ', '.'), '_', "{$browser}_{$version}");
+                $behat_yml[$browser_version]['context']['class'] = 'FeatureContext';
+                $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['default_session'] = 'selenium2';
+                $behat_yml[$browser_version]['extensions']['Behat\MinkExtension\Extension']['selenium2'] = array(
+                    'browser' => $browser,
+                    'wd_host' => "{$username}:{$token}@ondemand.saucelabs.com/wd/hub",
+                    'capabilities' => array(
+                        "platform" => "$os",
+                        'browser' => "$browser",
+                        'version' => "$version",
+                        'name' => "Behat Test {$browser} {$version} for $name"
+                    )
+                );
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ function behat_editor_saucelabs_drush_command() {
         'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
         'arguments' => array(
             'module' => 'The module name that the test file is in',
-            'filename' => 'The file name to test. Should be in present folder',
+            'path' => 'This is the path to the file. But if the file lives in default/files/behat_tests/features it would be behat_tests/filename.feature. But if it is a subfolder it would be behat_tests/tests/filename.feature showing the full path.',
             'javascript' => '1 if you want to run javascript based tests 0 if not. Javascript means you are running this locally.',
             'tag' => 'Add tag to only run test on. Eg @anonymous',
             'profile' => 'The behat.yml file has profiles. Default etc. You can call one here or blank = default',
@@ -50,10 +50,12 @@ function behat_editor_saucelabs_drush_command() {
     return $items;
 }
 
-
+/**
+ * @TODO merge all of this into the default behat drush
+ */
 function drush_behat_editor_saucelabs_behat_run_sauce() {
     $module = func_get_arg(0);
-    $filename = func_get_arg(1);
+    $path = func_get_arg(1);
     if(func_num_args() > 2) {
         $javascript = func_get_arg(2);
     } else {
@@ -84,10 +86,18 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
         $pass_fail = 0;
     }
     composer_manager_register_autoloader();
-    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
 
-    $file = new Drupal\BehatEditor\File(array(), $module, $filename, FALSE);
-    $file_object = $file->get_file_info();
+    $file_path = explode("/", $path);
+    $file_path_temp = $file_path;
+    $filename = array_pop($file_path_temp);
+    $file = new BehatEditor\FileController();
+    $params = array(
+        'service_path' => $file_path,
+        'module' => $module,
+        'filename' => $filename,
+        'action' => 'view'
+    );
+    $file_object = $file->show($params);
 
     $run = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
     print "Running Tests...\n";
@@ -116,7 +126,6 @@ function drush_behat_editor_saucelabs_behat_run_sauce() {
 //@todo fix this it has fell behind other code
 function drush_behat_editor_behat_run_sauce_folder() {
     print "Running Tests...\n";
-    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
     composer_manager_register_autoloader();
     //@todo validate args
     $module = func_get_arg(0);

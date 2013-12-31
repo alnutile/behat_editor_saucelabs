@@ -2,7 +2,6 @@
 use Drupal\BehatEditorSauceLabs;
 
 function behat_editor_saucelabs_run($module, $filename) {
-    module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
     module_load_include('inc', 'behat_editor', 'includes/behat_editor_run');
 
     composer_manager_register_autoloader();
@@ -10,18 +9,24 @@ function behat_editor_saucelabs_run($module, $filename) {
     if($_REQUEST['method'] == 'view-mode') {
         //@todo include these in autoloader
         //  since all functions are in a class now
-        module_load_include('inc', 'behat_editor', 'helpers/behat_helpers_app');
-        module_load_include('inc', 'behat_editor', 'tpl/behat_shared_views');
 
         if (!class_exists('Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun')) {
             $message = t('BehatEditorSauceLabsRun not found.');
             throw new \RuntimeException($message);
         }
-        $filename = $filename . ".feature";
+
         $settings = $_REQUEST['settings'];
-        $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, FALSE);
-        $file_object = $file->get_file_info();
+        $file = new Drupal\BehatEditor\FileController();
+        $params = array(
+            'service_path' => $settings['path'],
+            'module' => $settings['module'],
+            'filename' => $settings['filename'],
+            'action' => 'run'
+        );
+
+        $file_object = $file->show($params);
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
+
         $run_test_response = $res->exec(FALSE, $settings);
         //Check the Response from Running the Tests
         if($run_test_response['rid']) {
@@ -40,11 +45,25 @@ function behat_editor_saucelabs_run($module, $filename) {
             throw new \RuntimeException($message);
         }
         $settings = $_REQUEST['settings'];
-        $file = new Drupal\BehatEditor\File($_REQUEST, $module, $filename, 'file');
-        $response = $file->save_html_to_file();
+
+        $file = new Drupal\BehatEditor\FileController();
+        $action = 'save';
+        if(isset($settings['action'])) {
+            $action = $settings['action'];
+        }
+
+        $params = array(
+            'service_path' => $settings['path'],
+            'module' => $settings['module'],
+            'filename' => $settings['filename'],
+            'action' =>  $action,
+            'scenario' => $_REQUEST['scenario'],
+            'parse_type' => 'file',
+        );
+        $response = $file->save($params);
+
         if($response['file'] != FALSE){
-            $file_object = $file->get_file_info();
-            $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
+            $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file->show($params));
             $run_test_response = $res->exec(FALSE, $settings);
             if($run_test_response['rid']) {
                 $results = $res->generateReturnPassOutput();
