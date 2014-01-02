@@ -269,7 +269,7 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
                         "platform" => "$os",
                         'browser' => "$browser",
                         'version' => "$version",
-                        'name' => "Behat Test {$browser} {$version} for $name"
+                        'name' => "$name"
                     )
                 );
             }
