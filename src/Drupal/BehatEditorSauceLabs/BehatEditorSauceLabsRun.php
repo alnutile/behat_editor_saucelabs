@@ -49,8 +49,8 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command = implode(' ', $command);
 
         exec($command, $output, $return_var);
-
-        $behat_yml_path->deleteBehatYmlFile();
+        watchdog('test_sl_command', print_r($command, 1));
+        //$behat_yml_path->deleteBehatYmlFile();
 
         $results = new BehatEditor\Results();
         $output = $results->prepareResultsAndInsert($output, $return_var, $settings, $this->filename, $this->module);
