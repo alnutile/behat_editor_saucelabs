@@ -36,6 +36,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
 
         //@todo move this into a shared method for exec and execDrush
         $this->settings['context'] = $context1;
+
         $behat_yml_path = new BehatEditor\GenerateBehatYml($this->settings);
         $this->behat_yml = $behat_yml_path->writeBehatYmlFile();
 
@@ -49,8 +50,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
         $command = implode(' ', $command);
 
         exec($command, $output, $return_var);
-        watchdog('test_sl_command', print_r($command, 1));
-        //$behat_yml_path->deleteBehatYmlFile();
+        $behat_yml_path->deleteBehatYmlFile();
 
         $results = new BehatEditor\Results();
         $output = $results->prepareResultsAndInsert($output, $return_var, $settings, $this->filename, $this->module);
