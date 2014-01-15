@@ -217,7 +217,6 @@ function behat_editor_saucelabs_behat_editor_command_alter(&$command, $context1)
  *
  */
 function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $context1, $settings) {
-    watchdog('test_settings_context', print_r($settings, 1));
     if( $context1 == 'generate_yml' ) {
         //@TODO clean up this double if statement just may need to rethink the best way to alter this proecess
         if ( isset($settings['context']) && ( $settings['context'] == 'behat_run_saucelabs' || $settings['context'] == 'behat_run_batch') ) {
