@@ -1,6 +1,13 @@
 <?php
 use Drupal\BehatEditorSauceLabs;
 
+/**
+ * @file
+ * @TODO this will no longer be needed once the
+ *   behat_editor_run.js is updated to match the behat_editor_add_run.js which uses
+ *   the default endpoint that comes with behat_editor for running tests.
+ */
+
 function behat_editor_saucelabs_run($module, $filename) {
     module_load_include('inc', 'behat_editor', 'includes/behat_editor_run');
 
@@ -15,6 +22,11 @@ function behat_editor_saucelabs_run($module, $filename) {
             throw new \RuntimeException($message);
         }
 
+        $context1 = 'behat_run_saucelabs';
+        if(isset($settings['context'])) {
+            $context1 = $settings['context'];
+        }
+
         $settings = $_REQUEST['settings'];
         $file = new Drupal\BehatEditor\FileController();
         $params = array(
@@ -27,7 +39,7 @@ function behat_editor_saucelabs_run($module, $filename) {
         $file_object = $file->show($params);
         $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file_object);
 
-        $run_test_response = $res->exec(FALSE, $settings);
+        $run_test_response = $res->exec(FALSE, $settings, $context1);
         //Check the Response from Running the Tests
         if($run_test_response['rid']) {
             $results = $res->generateReturnPassOutput();
@@ -45,6 +57,11 @@ function behat_editor_saucelabs_run($module, $filename) {
             throw new \RuntimeException($message);
         }
         $settings = $_REQUEST['settings'];
+
+        $context1 = 'behat_run_saucelabs';
+        if(isset($settings['context'])) {
+            $context1 = $settings['context'];
+        }
 
         $file = new Drupal\BehatEditor\FileController();
         $action = 'save';
@@ -64,7 +81,7 @@ function behat_editor_saucelabs_run($module, $filename) {
 
         if($response['file'] != FALSE){
             $res = new Drupal\BehatEditorSauceLabs\BehatEditorSauceLabsRun($file->show($params));
-            $run_test_response = $res->exec(FALSE, $settings);
+            $run_test_response = $res->exec(FALSE, $settings, $context1);
             if($run_test_response['rid']) {
                 $results = $res->generateReturnPassOutput();
                 drupal_json_output($results);
