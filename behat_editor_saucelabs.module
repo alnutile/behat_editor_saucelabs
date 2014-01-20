@@ -220,7 +220,6 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
     if( $context1 == 'generate_yml' ) {
         //@TODO clean up this double if statement just may need to rethink the best way to alter this proecess
         if ( isset($settings['context']) && ( $settings['context'] == 'behat_run_saucelabs' || $settings['context'] == 'behat_run_batch') ) {
-            watchdog('test_settings_context_post_check', print_r($settings, 1));
 
             /**
              * needed to set some things for these but not android
