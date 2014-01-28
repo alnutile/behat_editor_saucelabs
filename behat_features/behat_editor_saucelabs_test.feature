@@ -4,7 +4,7 @@ Feature: Test Saucelabs Run and View tests
     Given I am on "/user/logout"
     Then I am on "/user/login"
     And I fill in "Username" with "admin"
-    And I fill in "Password" with "Welcome2013"
+    And I fill in "Password" with "password"
     And I press "Log in"
     And I wait for "3" seconds
     Given I run drush "cache-clear drush"
