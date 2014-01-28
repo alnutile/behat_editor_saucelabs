@@ -10,7 +10,6 @@
  * @return mixed
  */
 function behat_editor_saucelabs_admin_form($form, &$form_state) {
-
         $form['behat_editor_saucelabs_username'] = array(
             '#type' => 'textfield',
             '#title' => t('SauceLabs Username'),
