@@ -14,9 +14,6 @@
     "support": {
         "issues": "https://github.com/alnutile/behat_editor_saucelabs/issues"
     },
-    "require": {
-        "behat/behat": "*"
-    },
     "autoload": {
         "psr-0": {
             "Drupal\\BehatEditorSauceLabs": "src/"
