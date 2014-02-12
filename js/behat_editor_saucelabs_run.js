@@ -33,8 +33,13 @@
                     if ($('ul.scenario').attr('data-mode')) {
                         method = $('ul.scenario').data('mode');
                     }
-                    var scenario = $('ul.scenario:eq(0) > li').not('.ignore');
-                    var scenario_array = Drupal.behat_editor.make_scenario_array(scenario);
+                    if ( $('#test-textbox').length ) {
+                        var scenario = Drupal.ace.editor.getValue();
+                        var scenario_array = scenario.split("\n");
+                    } else {
+                        var scenario = $('ul.scenario:eq(0) > li').not('.ignore');
+                        var scenario_array = Drupal.behat_editor.make_scenario_array(scenario);
+                    }
                     var base_url_usid = $('select#edit-users option:selected').val();
                     var base_url_gsid = $('select#edit-group option:selected').val();
                     var multi_browser_os = Drupal.behat_editor.get_selected_os_browser($('#edit-multi-os-browser'));
