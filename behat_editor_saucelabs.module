@@ -247,6 +247,7 @@ function behat_editor_saucelabs_behat_editor_yml_array_alter(&$behat_yml, $conte
                     'name' => "$name"
                 )
             );
+            $behat_yml['saucelabs']['extensions']['Behat\MinkExtension\Extension']['selenium2']['capabilities']['selenium-version'] = '2.39.0';
 
             /**
              * Setup some duration defaults for batchjobs only
