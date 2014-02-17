@@ -8,7 +8,7 @@
 
 function behat_editor_saucelabs_install() {
     //Download library
-    behat_editor_saucelabs_libraries();
+  //  behat_editor_saucelabs_libraries();
 }
 
 function behat_editor_saucelabs_libraries() {
@@ -18,21 +18,41 @@ function behat_editor_saucelabs_libraries() {
         $libraries = behat_editor_saucelabs_libraries_info();
         foreach($libraries as $key => $value) {
             if(!drupal_realpath(libraries_get_path($key))) {
-                if(!drupal_mkdir($libraries_path . '/' . $key)) {
-                    drupal_set_message("Could not make libraries folder");
-                    return;
-                } else {
-                    chdir($libraries_path . '/' . $key);
-                    if (!shell_exec('wget ' . $libraries[$key]['download url'] . ' -O file.zip')) {
-                        shell_exec('curl ' . $libraries[$key]['download url'] . ' > file.zip' );
+              // this fails if the directory exists. Need better error handling
+                // the directory to be created
+                $lp = $libraries_path . '/' . $key;
+                // check if the directory exists first and if not create it
+                if(!file_exists($lp)){
+                  // if the directory cannot be created set a drupal message
+                  // and write to watchdog
+                    if(!mkdir($lp)) {
+                      watchdog("behat_editor_saucelabs", "Cannot create directory %s", array('%s'=>$lp),WATCHDOG_ERROR);
+                      drupal_set_message("Could not make libraries folder");                                        
                     }
-                    if(is_file('file.zip')) {
-                        shell_exec('unzip -qq -o file.zip');
-                        unlink('file.zip');
-                    }
+                }else {
+                    chdir($libraries_path . '/' . $key);    
+                    
+                    // flowplayer download filename
+                    $fp = "file.zip";
+                    
+                    // url to get the flowplayer from
+                    $dl_url = $libraries[$key]['download url'];
+                    
+                    if(!file_exists($fp)){
+                    
+                      // this needs better error control. or perhaps using the 
+                      // flow player module                    
+                      if (!shell_exec('wget ' . $dl_url . ' -O '.$fp)) {
+                          shell_exec('curl ' . $dl_url . ' > '.$fp );
+                      }
+                      if(is_file($fp)) {
+                          shell_exec('unzip -qq -o '.$fp);
+                          unlink($fp);
+                      }
                 }
             }
         }
+    }
 }
 
 /**
@@ -43,7 +63,8 @@ function behat_editor_saucelabs_update_7000() {
 
 /**
  * Add flowplayer library
- */
+*/
 function behat_editor_saucelabs_update_7001() {
     behat_editor_saucelabs_libraries();
 }
+ 

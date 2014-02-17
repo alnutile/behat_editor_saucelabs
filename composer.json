@@ -11,10 +11,11 @@
             "role": "The guy behind the keyboard"
         }
     ],
+    "require": {
+        
+    },
     "support": {
         "issues": "https://github.com/alnutile/behat_editor_saucelabs/issues"
-    },
-    "require": {
     },
     "autoload": {
         "psr-0": {
