@@ -1,40 +1,110 @@
 (function ($) {
     Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
-    Drupal.behat_editor_saucelabs.getOs = function() {
-        $( "#edit-os" ).load( "/admin/behat/saucelabs/os", function(data) {
-            var option_list = jQuery.parseJSON(data);
-            var os_list_unique = [];
-            $('body').data("sauce_options", option_list);
-            for(var i = 0; i < option_list['os'].length; i++) {
-                var os_name = option_list['os'][i]['os'];
-                os_list_unique[os_name] = os_name;
+
+
+    var os_browser =
+        {
+            'win12r2': {
+                'os': 'Windows 8.1',
+                'browsers':
+                    [
+                        {
+                            'nicename': 'IE 11',
+                            'saucename': 'internet explorer|11'
+                        },
+                        {
+                            'nicename': 'Firefox 26',
+                            'saucename': 'firefox|26'
+                        },
+                        {
+                            'nicename': 'Firefox 25',
+                            'saucename': 'firefox|25'
+                        }
+                    ]
+            },
+            'win12': {
+                'os': 'Windows 8',
+                'browsers':
+                    [
+                        {
+                        'nicename': 'IE 10',
+                        'saucename': 'internet explorer|10'
+                        }
+                    ]
+            },
+            'win2008': {
+                'os': 'Windows 7',
+                'browsers':
+                    [
+                        {
+                            'nicename': 'IE 9',
+                            'saucename': 'internet explorer|9'
+                        }
+                    ]
+            },
+            'mac10': {
+                'os': 'Mac 10.8',
+                'browsers':
+                    [
+                        {
+                            'nicename': 'iPad - 6.1',
+                            'saucename': 'ipad|6.1'
+                        },
+                        {
+                            'nicename': 'iPhone - 6.1',
+                            'saucename': 'iphone|6.1'
+                        },
+                        {
+                            'nicename': 'Safari 6',
+                            'saucename': 'safari|6'
+                        }
+                    ]
+            },
+            'linux': {
+                'os': 'Linux',
+                'browsers': [
+                    {
+                        'nicename': 'Google Chrome - 30',
+                        'saucename': 'chrome|30'
+                    },
+                    {
+                        'nicename': 'Android 4.3',
+                        'saucename': 'android|4.3'
+                    },
+                    {
+                        'nicename': 'Firefox 26',
+                        'saucename': 'firefox|26'
+                    },
+                    {
+                        'nicename': 'Firefox 25',
+                        'saucename': 'firefox|25'
+                    }
+                ]
             }
-            for(var key in os_list_unique) {
-                var nice_name = os_list_unique[key];
-                $('#edit-os').append($("<option />").val(nice_name).text(nice_name));
-                if(nice_name == 'Windows 2012') {
-                    $('#edit-os option[value="Windows 2012"]').attr('selected', 'selected');
-                    Drupal.behat_editor_saucelabs.getBrowser(nice_name);
-                }
-            }
-        });
+        };
+
+    Drupal.behat_editor_saucelabs.getOsSlimmedList = function() {
+        $('#edit-os').empty();
+        for (var key in os_browser) {
+            $('#edit-os').append($("<option />").val(os_browser[key].os).text(os_browser[key].os));
+        };
+
+        $('#edit-os option[value="Windows 8.1"]').attr('selected', 'selected');
     };
 
-    Drupal.behat_editor_saucelabs.getOsMulti = function() {
-        $( "#edit-multi-os-browser" ).load( "/admin/behat/saucelabs/os", function(data) {
-            var option_list = jQuery.parseJSON(data);
-            var os_list_unique = [];
-            $('body').data("sauce_options", option_list);
-            for(var i = 0; i < option_list['os'].length; i++) {
-                var os_name = option_list['os'][i]['os'];
-                os_list_unique[os_name] = os_name;
+    Drupal.behat_editor_saucelabs.getBrowserSlimmed = function(selectedOs) {
+        $('#edit-browser').empty();
+        for (var key in os_browser) {
+            if(os_browser[key].os == selectedOs) {
+                var selectedOsKey = key;
+                var browsers = os_browser[key].browsers;
             }
-            for(var key in os_list_unique) {
-                var nice_name = os_list_unique[key];
-                $('#edit-multi-os-browser').append($("<optgroup label='"+nice_name+"' />").val(nice_name).text(nice_name));
-                Drupal.behat_editor_saucelabs.getBrowserMulti(nice_name);
-            }
-        });
+        };
+        for( var key in browsers) {
+            var nicename = os_browser[selectedOsKey].browsers[key].nicename;
+            var saucename = os_browser[selectedOsKey].browsers[key].saucename;
+            $('#edit-browser').append($("<option />").val(saucename).text(nicename));
+        };
     };
 
     Drupal.behat_editor_saucelabs.api_info = function(job_id) {
@@ -91,10 +161,13 @@
             $('#edit-multi-os-browser').empty();
             Drupal.behat_editor_saucelabs.getOsMulti();
         }
-        Drupal.behat_editor_saucelabs.getOs();
+
+        Drupal.behat_editor_saucelabs.getOsSlimmedList();
+        Drupal.behat_editor_saucelabs.getBrowserSlimmed('Windows 8.1');
+
         $('#edit-os').on('change', function(){
             var selectedOs = $("option:selected", this).val();
-            Drupal.behat_editor_saucelabs.getBrowser(selectedOs);
+            Drupal.behat_editor_saucelabs.getBrowserSlimmed(selectedOs);
         });
     }
 

@@ -1,5 +1,9 @@
 (function($){
     Drupal.behat_editor = Drupal.behat_editor || {};
+
+
+
+    //This is for when we do multi browser os work
     Drupal.behat_editor.get_selected_os_browser = function(select_items) {
         if($('#edit-multi-os-browser')) {
             var options = [];
@@ -14,7 +18,7 @@
         } else {
             return false;
         }
-    }
+    };
 
     Drupal.behat_editor_saucelabs = Drupal.behat_editor_saucelabs || {};
 
