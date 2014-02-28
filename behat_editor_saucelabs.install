@@ -11,6 +11,10 @@ function behat_editor_saucelabs_install() {
     behat_editor_saucelabs_libraries();
 }
 
+function behat_editor_saucelabs_enable() {
+   behat_editor_saucelabs_libraries();
+}
+
 function behat_editor_saucelabs_libraries() {
     $libraries_path = 'sites/all/libraries';
     $libraries_path = drupal_realpath($libraries_path);
