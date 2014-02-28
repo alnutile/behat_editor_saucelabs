@@ -8,7 +8,7 @@
 
 function behat_editor_saucelabs_install() {
     //Download library
-  //  behat_editor_saucelabs_libraries();
+    behat_editor_saucelabs_libraries();
 }
 
 function behat_editor_saucelabs_libraries() {
