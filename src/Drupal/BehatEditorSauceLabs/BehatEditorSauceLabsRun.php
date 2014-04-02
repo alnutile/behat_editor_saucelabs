@@ -7,8 +7,6 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
 
     public function __construct($file_object) {
         parent::__construct($file_object);
-        $path = drupal_get_path('module', 'behat_editor_saucelabs');
-        $this->yml_path = drupal_realpath($path) . '/behat/behat.yml';
     }
 
 
