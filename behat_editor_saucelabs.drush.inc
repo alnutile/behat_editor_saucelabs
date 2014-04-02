@@ -14,6 +14,17 @@ use Drupal\BehatEditorSauceLabs,
 function behat_editor_saucelabs_drush_command() {
     $items = array();
 
+    $items['behat-sauce-libraries'] = array(
+        'description' => "Get libraries",
+        'allow-additional-options' => FALSE,
+        'aliases' => array('bsl'),
+        'examples' => array(
+            'drush bsl' => "Gets the libraries"
+        ),
+        'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
+        'arguments' => array()
+    );
+
     $items['behat-run-sauce'] = array(
         'description' => 'Pass a module name and filename to run on SauceLabss',
         'allow-additional-options' => TRUE,
@@ -48,6 +59,11 @@ function behat_editor_saucelabs_drush_command() {
         ),
     );
     return $items;
+}
+
+function drush_behat_editor_saucelabs_behat_sauce_libraries() {
+    require_once('behat_editor_saucelabs.install');
+    behat_editor_saucelabs_libraries();
 }
 
 /**

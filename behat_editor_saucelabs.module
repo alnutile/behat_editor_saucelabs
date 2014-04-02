@@ -99,7 +99,10 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
             $module = BEHAT_EDITOR_DEFAULT_FOLDER;
         }
         $path = drupal_get_path('module', 'behat_editor_saucelabs');
-        $library_path = libraries_get_path('behat_editor_saucelabs_flowplayer'); //@todo use the api better for libraries
+        $library_path = libraries_get_path('flowplayer'); //@todo use the api better for libraries
+        if($library_path == false) {
+            $library_path = libraries_get_path('behat_editor_saucelabs_flowplayer') . '/flowplayer';
+        }
         $form['#attached']['js']['behat_editor_saucelabs_app'] = $path . '/js/behat_editor_saucelabs_app.js';
         if($form_id == 'behat_editor_add_form') {
             $form['#attached']['js']['behat_editor_saucelabs_run'] = $path . '/js/behat_editor_saucelabs_add_run.js';
@@ -108,9 +111,10 @@ function behat_editor_saucelabs_form_alter(&$form, $form_state, $form_id) {
         }
 
         $form['#attached']['js']['behat_editor_saucelabs_settings'] = $path . '/js/behat_editor_saucelabs_settings.js';
-        $form['#attached']['js']['behat_editor_saucelabs_video'] = $library_path . '/flowplayer/flowplayer-3.2.12.min.js';
+        $form['#attached']['js']['behat_editor_saucelabs_video'] = $library_path . '/flowplayer-3.2.12.min.js';
         $form['#attached']['css']['behat_editor_saucelabs_run'] = $path . '/css/app.css';
-        $flow_path = '/' . $library_path . '/flowplayer/flowplayer-3.2.16.swf';
+        $flow_path = '/' . $library_path . '/flowplayer-3.2.16.swf';
+        //@TODO Just to test a deployment error
         drupal_add_js(array('behat_editor_saucelabs' => array('flow_path' => "{$flow_path}")), 'setting');
         $form['actions']['saucelabs_run'] = array(
             '#type' => 'link',
@@ -336,7 +340,7 @@ function behat_editor_saucelabs_libraries_info() {
             'line' => '2'
         ),
         'files' => array(
-            'js' => array('flowplayer/flowplayer-3.2.16.min.js'),
+            'js' => array('/flowplayer-3.2.16.min.js'),
         ),
     );
 

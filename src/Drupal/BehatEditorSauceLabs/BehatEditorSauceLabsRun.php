@@ -22,7 +22,7 @@ class BehatEditorSauceLabsRun extends BehatEditor\BehatEditorRun {
      * @param string $context1
      * @return array
      */
-    public function exec($javascript = FALSE, $settings = array(), $context1 = 'behat_run_saucelabs') {
+    public function exec($javascript = FALSE, $settings = array(), $context1 = 'behat_run_saucelabs', $tag_include = FALSE, $profile = 'default') {
         composer_manager_register_autoloader();
         if($javascript == TRUE) {
             $tags = '';

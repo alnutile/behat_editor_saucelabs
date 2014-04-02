@@ -1,6 +1,14 @@
 After you enable the module you will need to visit composer_manager [admin/config/system/composer-manager]
 and allow it to rebuild composer.json from the composer.json file in this modules folder.
 
+You may have to install libraries running
+drush bsl
+this will install the libraries
+
+WARNING if you get stuck and drupal will not load run
+drush rr
+
+
 
 After that you need to put your Saucelabs info into the admin area here
 [admin/config/system/behat-editor/sauce-labs]
@@ -10,7 +18,7 @@ You can get your API on the lower left of the screen once you log in on the Dash
 This will all go into your behat.yml file in the behat folder of this module.
 See the behat.yml.sample file that is in that folder.
 
-Note: to make sure tests run on saucleabs see the behat.yml.sample file
+Note: to make sure tests run on sauceleabs see the behat.yml.sample file
 
 Webdriver-saucelabs:
   context:

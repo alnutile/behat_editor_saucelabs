@@ -1,3 +1,8 @@
+1.6.1
+----
+fix bad flowplayer path
+update the exec method to match the parent one
+..
 1.6.0
 ----
 no changes

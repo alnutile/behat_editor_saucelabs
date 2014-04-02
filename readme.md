@@ -5,9 +5,12 @@ A new button will appear if you have permissions on your View, Edit and Add page
 
 see install.txt for more info.
 
+
+
 # Drush
 drush brs module_name filename to run that test on Sauce from drush
 drush help brs #for more info
+drush bsl to install libraries
 
 # Todo
 
